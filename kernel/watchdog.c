@@ -11,6 +11,10 @@
  * Some chunks also taken from arch/x86/kernel/apic/nmi.c, thanks
  * to those contributors as well.
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #include <linux/mm.h>
 #include <linux/cpu.h>
@@ -301,7 +305,13 @@ static enum hrtimer_restart watchdog_timer_fn(struct hrtimer *hrtimer)
 		print_modules();
 		print_irqtrace_events(current);
 		if (regs)
-			show_regs(regs);
+			
+
+			show_regs_fatal(regs);
+
+
+
+			
 		else
 			dump_stack();
 

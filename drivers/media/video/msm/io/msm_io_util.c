@@ -9,6 +9,11 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
+
 
 #include <linux/delay.h>
 #include <linux/clk.h>
@@ -211,6 +216,7 @@ int msm_camera_request_gpio_table(struct msm_camera_sensor_info *sinfo,
 			pr_err("%s common gpio request failed\n", __func__);
 			return rc;
 		}
+#if !defined(DVE005_CAMERA_DRV)
 		rc = gpio_request_array(gpio_conf->cam_gpio_req_tbl,
 				gpio_conf->cam_gpio_req_tbl_size);
 		if (rc < 0) {
@@ -219,9 +225,12 @@ int msm_camera_request_gpio_table(struct msm_camera_sensor_info *sinfo,
 				gpio_conf->cam_gpio_common_tbl_size);
 			return rc;
 		}
+#endif 
 	} else {
+#if !defined(DVE005_CAMERA_DRV)
 		gpio_free_array(gpio_conf->cam_gpio_req_tbl,
 				gpio_conf->cam_gpio_req_tbl_size);
+#endif 
 		gpio_free_array(gpio_conf->cam_gpio_common_tbl,
 			gpio_conf->cam_gpio_common_tbl_size);
 	}

@@ -10,6 +10,10 @@
  * GNU General Public License for more details.
  *
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #include <linux/workqueue.h>
 #include <linux/delay.h>
@@ -34,6 +38,11 @@ static struct msm_cam_server_dev g_server_dev;
 static struct class *msm_class;
 static dev_t msm_devno;
 static int vnode_count;
+
+
+
+int i2c_error_flag;
+
 
 module_param(msm_camera_v4l2_nr, uint, 0644);
 MODULE_PARM_DESC(msm_camera_v4l2_nr, "videoX start number, -1 is autodetect");
@@ -181,9 +190,15 @@ static int msm_server_control(struct msm_cam_server_dev *server_dev,
 
 	/* wait for config return status */
 	D("Waiting for config status\n");
-	rc = wait_event_interruptible_timeout(queue->wait,
+
+	rc = wait_event_timeout(queue->wait,
 		!list_empty_careful(&queue->list),
 		msecs_to_jiffies(out->timeout_ms));
+
+
+
+
+
 	D("Waiting is over for config status\n");
 	if (list_empty_careful(&queue->list)) {
 		if (!rc)
@@ -1000,11 +1015,21 @@ static int msm_camera_v4l2_streamoff(struct file *f, void *pctx,
 		not in use when we free the buffers */
 	mutex_lock(&pcam->vid_lock);
 	mutex_lock(&pcam_inst->inst_lock);
-	pcam_inst->streamon = 0;
+
+
+
+
+
 	if (g_server_dev.use_count > 0)
 		rc = msm_server_streamoff(pcam, pcam_inst->my_index);
 	if (rc < 0)
 		pr_err("%s: hw failed to stop streaming\n", __func__);
+
+
+
+	pcam_inst->streamon = 0;
+
+
 
 	/* stop buffer streaming */
 	rc = vb2_streamoff(&pcam_inst->vid_bufq, buf_type);
@@ -1481,12 +1506,26 @@ static int msm_open(struct file *f)
 	struct msm_cam_v4l2_device *pcam  = video_drvdata(f);
 	struct msm_cam_v4l2_dev_inst *pcam_inst;
 
+
+	int ret = -EINVAL;
+	int errflag1 = 0;
+	int errflag2 = 0;
+	int errflag3 = 0;
+	int errflag4 = 0;
+	int errflag5 = 0;
+
+
 	D("%s\n", __func__);
 
 	if (!pcam) {
 		pr_err("%s NULL pointer passed in!\n", __func__);
 		return rc;
 	}
+	
+
+	i2c_error_flag = false;
+
+
 	mutex_lock(&pcam->vid_lock);
 	for (i = 0; i < MSM_DEV_INST_MAX; i++) {
 		if (pcam->dev_inst[i] == NULL)
@@ -1588,41 +1627,114 @@ static int msm_open(struct file *f)
 	/* rc = msm_cam_server_open_session(g_server_dev, pcam);*/
 	return rc;
 
+
+
 msm_send_open_server_failed:
-	v4l2_fh_del(&pcam_inst->eventHandle);
-	v4l2_fh_exit(&pcam_inst->eventHandle);
-
+	errflag5 = 1;
 mctl_event_q_setup_failed:
-	v4l2_device_unregister_subdev(pcam->mctl.isp_sdev->sd_vpe);
+	errflag4 = 1;
 mctl_register_isp_sd_vpe_failed:
-	v4l2_device_unregister_subdev(pcam->mctl.isp_sdev->sd);
+	errflag3 = 1;
 mctl_register_isp_sd_failed:
-	if (pcam->mctl.mctl_release)
-		if (pcam->mctl.mctl_release(&(pcam->mctl)) < 0)
-			pr_err("%s: mctl_release failed\n", __func__);
-
+	errflag2 = 1;
 mctl_open_failed:
-	if (pcam->use_count == 1) {
-#ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
+	errflag1 = 1;
+msm_cam_server_open_session_failed:
+	pcam->use_count--;
+	D("%s Closing down instance %p ", __func__, pcam_inst);
+	D("%s index %d nodeid %d count %d\n", __func__, pcam_inst->my_index,pcam->vnode_id, pcam->use_count);
+	pcam->dev_inst[pcam_inst->my_index] = NULL;
+	if(errflag5 == 1){
+		if (pcam_inst->my_index == 0) {
+			v4l2_fh_del(&pcam_inst->eventHandle);
+			v4l2_fh_exit(&pcam_inst->eventHandle);
+		}
+	}
+	kfree(pcam_inst);
+	f->private_data = NULL;
+
+	if (pcam->use_count == 0) {
+		if(errflag3 ==1){
+			if(pcam->mctl.isp_sdev->sd !=NULL){
+				v4l2_device_unregister_subdev(pcam->mctl.isp_sdev->sd);
+			}
+		}
+
+		if(errflag4 ==1){
+			if(pcam->mctl.isp_sdev->sd_vpe != NULL){
+				v4l2_device_unregister_subdev(pcam->mctl.isp_sdev->sd_vpe);
+			}
+		}
+		
+		if(errflag1 ==1){
+			ret = msm_cam_server_close_session(&g_server_dev, pcam);
+			if (ret < 0)
+				pr_err("close_session fails %d\n", ret);
+		}
+
+		if(errflag2 ==1){
+			if (pcam->mctl.mctl_release) {
+				ret = pcam->mctl.mctl_release(&(pcam->mctl));
+				if (ret < 0)
+					pr_err("mctl_release fails %d\n", ret);
+			}
+		}
+
+
 		if (ion_client_created) {
 			pr_err("%s: destroy ion client", __func__);
 			kref_put(&pcam->mctl.refcount, msm_release_ion_client);
 		}
-#endif
-		if (msm_cam_server_close_session(&g_server_dev, pcam) < 0)
-			pr_err("%s: msm_cam_server_close_session failed\n",
-				__func__);
+
+		if (g_server_dev.use_count == 0)
+			mutex_unlock(&g_server_dev.server_lock);
+
 	}
 
-msm_cam_server_open_session_failed:
-	if (pcam->use_count == 1) {
-		pcam->dev_inst[i] = NULL;
-		pcam->use_count = 0;
-	}
-	pcam->dev_inst[i] = NULL;
+	errflag1 = 0;
+	errflag2 = 0;
+	errflag3 = 0;
+	errflag4 = 0;
+
 	mutex_unlock(&pcam->vid_lock);
-	kfree(pcam_inst);
 	return rc;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 static int msm_addr_remap(struct msm_cam_v4l2_dev_inst *pcam_inst,
@@ -1694,6 +1806,10 @@ void msm_release_ion_client(struct kref *ref)
 static int msm_close(struct file *f)
 {
 	int rc = 0;
+
+	int i = 0;
+	int image_mode_use_count = 0;
+
 	struct msm_cam_v4l2_device *pcam;
 	struct msm_cam_v4l2_dev_inst *pcam_inst;
 	pcam_inst = container_of(f->private_data,
@@ -1720,7 +1836,24 @@ static int msm_close(struct file *f)
 
 	pcam_inst->streamon = 0;
 	pcam->use_count--;
-	pcam->dev_inst_map[pcam_inst->image_mode] = NULL;
+
+    for( i = 0; i < MSM_DEV_INST_MAX; i++) {
+        if(pcam->dev_inst[i] != NULL) {
+            if( pcam->dev_inst[i]->image_mode == pcam_inst->image_mode ) {
+                image_mode_use_count++;
+                D("image_mode_use_count increment %d\n",image_mode_use_count);
+            }
+        }
+    }
+
+    if( image_mode_use_count <= 1 )
+    {
+        D("pcam->dev_inst_map[%d] set NULL\n",pcam_inst->image_mode);
+    	pcam->dev_inst_map[pcam_inst->image_mode] = NULL;
+
+    }
+
+
 	if (pcam_inst->vbqueue_initialized)
 		vb2_queue_release(&pcam_inst->vid_bufq);
 	D("%s Closing down instance %p ", __func__, pcam_inst);
@@ -2646,7 +2779,11 @@ static int msm_sync_init(struct msm_sync *sync,
 	struct platform_device *pdev)
 {
 	int rc = 0;
-	wake_lock_init(&sync->wake_lock, WAKE_LOCK_IDLE, "msm_camera");
+
+	wake_lock_init(&sync->wake_lock, WAKE_LOCK_SUSPEND, "msm_camera");
+
+
+
 	sync->opencnt = 0;
 	mutex_init(&sync->lock);
 	return rc;

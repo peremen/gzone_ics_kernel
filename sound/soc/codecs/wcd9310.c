@@ -9,6 +9,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/firmware.h>
@@ -31,7 +35,9 @@
 #include <linux/pm_runtime.h>
 #include <linux/kernel.h>
 #include <linux/gpio.h>
+#include <linux/msm_audio.h>
 #include "wcd9310.h"
+DEFINE_MUTEX(wcd9310_dev_lock);
 
 #define WCD9310_RATES (SNDRV_PCM_RATE_8000|SNDRV_PCM_RATE_16000|\
 			SNDRV_PCM_RATE_32000|SNDRV_PCM_RATE_48000)
@@ -2147,12 +2153,14 @@ static void tabla_get_mbhc_micbias_regs(struct snd_soc_codec *codec,
 
 	switch (tabla->mbhc_cfg.micbias) {
 	case TABLA_MICBIAS1:
+	    printk("skr:TABLA_MICBIAS1\n");
 		cfilt = tabla->pdata->micbias.bias1_cfilt_sel;
 		micbias_regs->mbhc_reg = TABLA_A_MICB_1_MBHC;
 		micbias_regs->int_rbias = TABLA_A_MICB_1_INT_RBIAS;
 		micbias_regs->ctl_reg = TABLA_A_MICB_1_CTL;
 		break;
 	case TABLA_MICBIAS2:
+	    printk("skr:TABLA_MICBIAS2\n");
 		cfilt = tabla->pdata->micbias.bias2_cfilt_sel;
 		micbias_regs->mbhc_reg = TABLA_A_MICB_2_MBHC;
 		micbias_regs->int_rbias = TABLA_A_MICB_2_INT_RBIAS;
@@ -4329,6 +4337,9 @@ void tabla_mbhc_init(struct snd_soc_codec *codec)
 	snd_soc_update_bits(codec, TABLA_A_CDC_MBHC_B1_CTL, 0x02, 0x02);
 
 	snd_soc_update_bits(codec, TABLA_A_MBHC_SCALING_MUX_2, 0xF0, 0xF0);
+
+	 
+	snd_soc_update_bits(codec, TABLA_A_MICB_1_MBHC, 0x03,tabla->mbhc_cfg.micbias);	
 }
 
 static bool tabla_mbhc_fw_validate(const struct firmware *fw)
@@ -4874,6 +4885,14 @@ tabla_codec_get_plug_type(struct snd_soc_codec *codec, bool highhph)
 	/* make sure override is on */
 	WARN_ON(!(snd_soc_read(codec, TABLA_A_CDC_MBHC_B1_CTL) & 0x04));
 
+	
+	plug_type_ptr =
+	    TABLA_MBHC_CAL_PLUG_TYPE_PTR(tabla->mbhc_cfg.calibration);
+	plug_type[0] = PLUG_TYPE_INVALID;
+
+	snd_soc_update_bits(codec, 0x12E, 0x40, TABLA_CFILT_FAST_MODE);
+	
+
 	/* performs DCEs for N times
 	 * 1st: check if voltage is in invalid range
 	 * 2nd - N-2nd: check voltage range and delta
@@ -4925,9 +4944,11 @@ tabla_codec_get_plug_type(struct snd_soc_codec *codec, bool highhph)
 			 inval);
 	}
 
-	plug_type_ptr =
-	    TABLA_MBHC_CAL_PLUG_TYPE_PTR(tabla->mbhc_cfg.calibration);
-	plug_type[0] = PLUG_TYPE_INVALID;
+
+
+
+
+
 	for (i = 0; !inval && i < num_det; i++) {
 		/*
 		 * If we are here, means none of the all
@@ -4958,6 +4979,7 @@ tabla_codec_get_plug_type(struct snd_soc_codec *codec, bool highhph)
 		}
 	}
 
+	snd_soc_update_bits(codec, 0x12E, 0x40, TABLA_CFILT_SLOW_MODE);	
 	return plug_type[0];
 }
 
@@ -5864,13 +5886,13 @@ static const struct tabla_reg_mask_val tabla_1_1_reg_defaults[] = {
 	TABLA_REG_VAL(TABLA_A_RX_LINE_5_GAIN, 0x10),
 
 	/* Tabla 1.1 RX Changes */
-	TABLA_REG_VAL(TABLA_A_CDC_RX1_B5_CTL, 0x78),
-	TABLA_REG_VAL(TABLA_A_CDC_RX2_B5_CTL, 0x78),
-	TABLA_REG_VAL(TABLA_A_CDC_RX3_B5_CTL, 0x78),
-	TABLA_REG_VAL(TABLA_A_CDC_RX4_B5_CTL, 0x78),
-	TABLA_REG_VAL(TABLA_A_CDC_RX5_B5_CTL, 0x78),
-	TABLA_REG_VAL(TABLA_A_CDC_RX6_B5_CTL, 0x78),
-	TABLA_REG_VAL(TABLA_A_CDC_RX7_B5_CTL, 0x78),
+	TABLA_REG_VAL(TABLA_A_CDC_RX1_B5_CTL, 0x7C), 
+	TABLA_REG_VAL(TABLA_A_CDC_RX2_B5_CTL, 0x7C),
+	TABLA_REG_VAL(TABLA_A_CDC_RX3_B5_CTL, 0x7C),
+	TABLA_REG_VAL(TABLA_A_CDC_RX4_B5_CTL, 0x7C),
+	TABLA_REG_VAL(TABLA_A_CDC_RX5_B5_CTL, 0x7C),
+	TABLA_REG_VAL(TABLA_A_CDC_RX6_B5_CTL, 0x7C),
+	TABLA_REG_VAL(TABLA_A_CDC_RX7_B5_CTL, 0x7C),
 
 	/* Tabla 1.1 RX1 and RX2 Changes */
 	TABLA_REG_VAL(TABLA_A_CDC_RX1_B6_CTL, 0xA0),
@@ -5970,16 +5992,17 @@ static const struct tabla_reg_mask_val tabla_codec_reg_init_val[] = {
 	{TABLA_A_CDC_CONN_RX_SB_B2_CTL, 0xFF, 0xAA},
 
 	/*enable HPF filter for TX paths */
-	{TABLA_A_CDC_TX1_MUX_CTL, 0x8, 0x0},
-	{TABLA_A_CDC_TX2_MUX_CTL, 0x8, 0x0},
-	{TABLA_A_CDC_TX3_MUX_CTL, 0x8, 0x0},
-	{TABLA_A_CDC_TX4_MUX_CTL, 0x8, 0x0},
-	{TABLA_A_CDC_TX5_MUX_CTL, 0x8, 0x0},
-	{TABLA_A_CDC_TX6_MUX_CTL, 0x8, 0x0},
-	{TABLA_A_CDC_TX7_MUX_CTL, 0x8, 0x0},
-	{TABLA_A_CDC_TX8_MUX_CTL, 0x8, 0x0},
-	{TABLA_A_CDC_TX9_MUX_CTL, 0x8, 0x0},
-	{TABLA_A_CDC_TX10_MUX_CTL, 0x8, 0x0},
+	{TABLA_A_CDC_TX1_MUX_CTL, 0x8, 0x08},
+	{TABLA_A_CDC_TX2_MUX_CTL, 0x8, 0x08}, 
+	{TABLA_A_CDC_TX3_MUX_CTL, 0x8, 0x08},
+	{TABLA_A_CDC_TX4_MUX_CTL, 0x8, 0x08},
+	{TABLA_A_CDC_TX5_MUX_CTL, 0x8, 0x08},
+	{TABLA_A_CDC_TX6_MUX_CTL, 0x8, 0x08},
+	{TABLA_A_CDC_TX7_MUX_CTL, 0x8, 0x08},
+	{TABLA_A_CDC_TX8_MUX_CTL, 0x8, 0x08},
+	{TABLA_A_CDC_TX9_MUX_CTL, 0x8, 0x08},
+	{TABLA_A_CDC_TX10_MUX_CTL, 0x8, 0x08},
+
 };
 
 static const struct tabla_reg_mask_val tabla_1_x_codec_reg_init_val[] = {
@@ -6432,14 +6455,118 @@ static struct platform_driver tabla1x_codec_driver = {
 	},
 };
 
+
+static int wcd9310_dev_open(struct inode *inode, struct file *file)
+{
+    pr_debug("%s - june\n", __func__);
+    return 0;
+}
+static int wcd9310_dev_release(struct inode *inode, struct file *file)
+{
+    pr_debug("%s - june\n", __func__);
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static long wcd9310_dev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+{
+    int ret = 0;
+    
+
+    pr_debug("%s - june\n", __func__);
+
+    mutex_lock(&wcd9310_dev_lock);
+    switch(cmd)
+    {
+    case WCD9310_GET_ID :
+        pr_debug("%s : WCD9310_GET_ID - june\n", __func__);
+        ret = 1;
+        break;
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    default :
+        ret = 0;
+        break;
+    }
+    mutex_unlock(&wcd9310_dev_lock);
+	return ret;
+}
+
+static const struct file_operations wcd9310_fops = {
+	.owner = THIS_MODULE,
+	.open = wcd9310_dev_open,
+	.release = wcd9310_dev_release,
+	.unlocked_ioctl = wcd9310_dev_ioctl
+};
+
+struct miscdevice wcd9310_dev = {
+	.minor	= MISC_DYNAMIC_MINOR,
+	.name	= "wcd9310_dev",
+	.fops	= &wcd9310_fops,
+};
+
+
+
 static int __init tabla_codec_init(void)
 {
-	int rtn = platform_driver_register(&tabla_codec_driver);
+	int rtn = 0;	
+  
+  rtn = platform_driver_register(&tabla_codec_driver);
 	if (rtn == 0) {
 		rtn = platform_driver_register(&tabla1x_codec_driver);
 		if (rtn != 0)
 			platform_driver_unregister(&tabla_codec_driver);
 	}
+
+  misc_register(&wcd9310_dev);	
 	return rtn;
 }
 

@@ -10,6 +10,10 @@
  * GNU General Public License for more details.
  *
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #include <linux/init.h>
 #include <linux/ioport.h>
@@ -28,8 +32,15 @@
 #include "board-8960.h"
 
 #ifdef CONFIG_FB_MSM_TRIPLE_BUFFER
-#define MSM_FB_PRIM_BUF_SIZE \
-		(roundup((1920 * 1200 * 4), 4096) * 3) /* 4 bpp x 3 pages */
+
+
+
+
+#define MSM_FB_PRIM_BUF_SIZE 	(roundup((800 * 480 * 4), 4096) * 3) 
+
+
+
+
 #else
 #define MSM_FB_PRIM_BUF_SIZE \
 		(roundup((1920 * 1200 * 4), 4096) * 2) /* 4 bpp x 2 pages */
@@ -49,13 +60,25 @@
 #define MSM_FB_SIZE roundup(MSM_FB_PRIM_BUF_SIZE + MSM_FB_EXT_BUF_SIZE, 4096)
 
 #ifdef CONFIG_FB_MSM_OVERLAY0_WRITEBACK
-#define MSM_FB_OVERLAY0_WRITEBACK_SIZE roundup((1920 * 1200 * 3 * 2), 4096)
+
+
+#define MSM_FB_OVERLAY0_WRITEBACK_SIZE roundup((800 * 480 * 3 * 2), 4096)
+
+
+
+
 #else
 #define MSM_FB_OVERLAY0_WRITEBACK_SIZE (0)
 #endif  /* CONFIG_FB_MSM_OVERLAY0_WRITEBACK */
 
 #ifdef CONFIG_FB_MSM_OVERLAY1_WRITEBACK
-#define MSM_FB_OVERLAY1_WRITEBACK_SIZE roundup((1920 * 1088 * 3 * 2), 4096)
+
+
+#define MSM_FB_OVERLAY1_WRITEBACK_SIZE roundup((800 * 480 * 3 * 2), 4096)
+
+
+
+
 #else
 #define MSM_FB_OVERLAY1_WRITEBACK_SIZE (0)
 #endif  /* CONFIG_FB_MSM_OVERLAY1_WRITEBACK */
@@ -77,6 +100,8 @@ unsigned char hdmi_is_primary = 1;
 #else
 unsigned char hdmi_is_primary;
 #endif
+
+unsigned int ts_lcd_flag = 1;
 
 static struct resource msm_fb_resources[] = {
 	{
@@ -324,9 +349,19 @@ static int mipi_dsi_liquid_panel_power(int on)
 static int mipi_dsi_cdp_panel_power(int on)
 {
 	static struct regulator *reg_l8, *reg_l23, *reg_l2;
-	static int gpio43;
-	int rc;
+	
+	
+	static struct regulator *reg_l29;
+	
+	
+	static int gpio24, gpio43; 
+	int rc,board_revision;
 
+	gpio24 = PM8921_GPIO_PM_TO_SYS(24);
+	gpio43 = PM8921_GPIO_PM_TO_SYS(43);
+
+	board_revision = get_m7system_board_revision();
+	
 	pr_debug("%s: state : %d\n", __func__, on);
 
 	if (!dsi_power_on) {
@@ -352,7 +387,27 @@ static int mipi_dsi_cdp_panel_power(int on)
 				PTR_ERR(reg_l2));
 			return -ENODEV;
 		}
-		rc = regulator_set_voltage(reg_l8, 2800000, 3000000);
+		
+		reg_l29 = regulator_get(NULL,"8921_l29");
+		if (IS_ERR(reg_l29)) 
+		{
+   			pr_err("could not get 8921_l29, rc = %ld\n",
+            PTR_ERR(reg_l29));
+	        return -ENODEV;
+		 }
+		rc = regulator_set_voltage(reg_l29, 1800000, 1800000);
+	    if (rc) {
+    	    pr_err("set_voltage 8921_l29 failed, rc=%d\n", rc);
+        	return -EINVAL;
+	    }
+		
+        
+
+        rc = regulator_set_voltage(reg_l8, 2800000, 2800000);
+
+
+
+		
 		if (rc) {
 			pr_err("set_voltage l8 failed, rc=%d\n", rc);
 			return -EINVAL;
@@ -367,15 +422,33 @@ static int mipi_dsi_cdp_panel_power(int on)
 			pr_err("set_voltage l2 failed, rc=%d\n", rc);
 			return -EINVAL;
 		}
-		gpio43 = PM8921_GPIO_PM_TO_SYS(43);
 		rc = gpio_request(gpio43, "disp_rst_n");
 		if (rc) {
 			pr_err("request gpio 43 failed, rc=%d\n", rc);
 			return -ENODEV;
 		}
+
+		if((board_revision != 3) && (board_revision != 8) && (board_revision != 9)) 
+		{
+			
+			gpio24 = PM8921_GPIO_PM_TO_SYS(24);
+			rc = gpio_request(gpio24, "bl_enable");
+			if (rc) {
+				pr_err("request gpio 24 failed, rc=%d\n", rc);
+				return -ENODEV;
+			}	
+
+		}
+
 		dsi_power_on = true;
 	}
 	if (on) {
+
+		int gpio17 = PM8921_GPIO_PM_TO_SYS(17);
+
+		gpio_set_value_cansleep(gpio17, 1);
+		gpio_direction_output(50, 1);
+
 		rc = regulator_set_optimum_mode(reg_l8, 100000);
 		if (rc < 0) {
 			pr_err("set_optimum_mode l8 failed, rc=%d\n", rc);
@@ -406,8 +479,42 @@ static int mipi_dsi_cdp_panel_power(int on)
 			pr_err("enable l2 failed, rc=%d\n", rc);
 			return -ENODEV;
 		}
+		
+			rc = regulator_enable(reg_l29);
+            if (rc) {
+                pr_err("enable I29 failed, rc=%d\n", rc);
+                return -ENODEV;
+			}
+			
+		
+
+	
+		mdelay(5);
+		gpio_set_value_cansleep(gpio43, 0);
+		mdelay(5);
 		gpio_set_value_cansleep(gpio43, 1);
+		mdelay(1);
+	
+	
+
+		
+			gpio_set_value_cansleep(gpio24, 1);
+			mdelay(10);
+			ts_lcd_flag = 1;
+			printk("%s: gpio_set_value_cansleep ts_lcd_flag[%d]\n", __func__, ts_lcd_flag);
+
 	} else {
+		
+		extern int lcd_status;
+
+		if(lcd_status)
+		{
+			printk("%s: gpio_set_value_cansleep lcd_status[%d]\n", __func__, lcd_status);
+			mdelay(100);
+		}
+		
+		ts_lcd_flag = 0;		
+		
 		rc = regulator_disable(reg_l2);
 		if (rc) {
 			pr_err("disable reg_l2 failed, rc=%d\n", rc);
@@ -439,8 +546,31 @@ static int mipi_dsi_cdp_panel_power(int on)
 			return -EINVAL;
 		}
 		gpio_set_value_cansleep(gpio43, 0);
+		
+		
+
+		
+			gpio_set_value_cansleep(gpio24, 0);   
+
+		
+		rc = regulator_disable(reg_l29);
+       if (rc) {
+       	pr_err("enable I29 failed, rc=%d\n", rc);
+		return -EINVAL;
+		}
+	   
+
+		mdelay(120);
+		printk("%s: gpio_set_value_cansleep\n", __func__);
+		
 	}
 	return 0;
+}
+
+void mipi_dsi_cdp_panel_power_interface(int on)
+{
+	printk("%s: mipi_dsi_cdp_panel_power_interface \n", __func__);
+	mipi_dsi_cdp_panel_power(on);
 }
 
 static int mipi_dsi_panel_power(int on)
@@ -730,21 +860,29 @@ static struct platform_device mipi_dsi_simulator_panel_device = {
 	.id = 0,
 };
 
-#define LPM_CHANNEL0 0
-static int toshiba_gpio[] = {LPM_CHANNEL0};
 
-static struct mipi_dsi_panel_platform_data toshiba_pdata = {
-	.gpio = toshiba_gpio,
-	.dsi_pwm_cfg = mipi_dsi_panel_pwm_cfg,
-};
 
-static struct platform_device mipi_dsi_toshiba_panel_device = {
-	.name = "mipi_toshiba",
+static struct platform_device mipi_dsi_lg4573b_panel_device = {
+	.name = "mipi_lg4573b",
 	.id = 0,
-	.dev = {
-		.platform_data = &toshiba_pdata,
-	}
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #define FPGA_3D_GPIO_CONFIG_ADDR	0xB5
 static int dsi2lvds_gpio[2] = {
@@ -887,21 +1025,28 @@ static struct msm_bus_scale_pdata dtv_bus_scale_pdata = {
 
 static struct lcdc_platform_data dtv_pdata = {
 	.bus_scale_table = &dtv_bus_scale_pdata,
-	.lcdc_power_save = hdmi_panel_power,
+
+
+
+
+
 };
 
-static int hdmi_panel_power(int on)
-{
-	int rc;
 
-	pr_debug("%s: HDMI Core: %s\n", __func__, (on ? "ON" : "OFF"));
-	rc = hdmi_core_power(on, 1);
-	if (rc)
-		rc = hdmi_cec_power(on);
 
-	pr_debug("%s: HDMI Core: %s Success\n", __func__, (on ? "ON" : "OFF"));
-	return rc;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
 #endif
 
 #ifdef CONFIG_FB_MSM_HDMI_MSM_PANEL
@@ -1119,8 +1264,13 @@ void __init msm8960_init_fb(void)
 
 	if (machine_is_msm8960_liquid())
 		platform_device_register(&mipi_dsi2lvds_bridge_device);
-	else
-		platform_device_register(&mipi_dsi_toshiba_panel_device);
+	else {
+
+		platform_device_register(&mipi_dsi_lg4573b_panel_device);
+
+
+
+	}
 
 	if (machine_is_msm8x60_rumi3()) {
 		msm_fb_register_device("mdp", NULL);

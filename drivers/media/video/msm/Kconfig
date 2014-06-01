@@ -1,3 +1,8 @@
+#/***********************************************************************/
+#/* Modified by                                                         */
+#/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+#/***********************************************************************/
+
 config MSM_CAMERA_V4L2
         bool "MSM Camera V4L2 Interface"
         depends on MSM_CAMERA
@@ -10,16 +15,32 @@ config MSM_CAMERA_V4L2
           and /dev/control0.
 
 comment "Camera Sensor Selection"
+
+config MT9M113
+	bool "Sensor mt9m113 (Aptina 1.3M)"
+	depends on MSM_CAMERA
+	default n
+	---help---
+	  Aptina 1.3M without Autofocus
+
+
+config MT9D115_SUB
+	bool "Sensor mt9d115_sub (Aptina 2.0M)"
+	depends on MSM_CAMERA && ARCH_MSM8960
+	default n
+	---help---
+	  Aptina 2.0M without Autofocus
+
 config MT9T013
 	bool "Sensor mt9t013 (BAYER 3M)"
 	depends on MSM_CAMERA && !ARCH_MSM8X60 && !ARCH_MSM8960 && !MSM_CAMERA_V4L2
-	default y
+	default n
 	---help---
 	  MICRON 3M Bayer Sensor with AutoFocus
 config MT9D113
 	bool "Sensor mt9d113 (YUV 2M)"
 	depends on MSM_CAMERA && ARCH_MSM8X60 && !MSM_CAMERA_V4L2
-	default y
+	default n
 	---help---
 	  MICRON 2M YUV Sensor
 	  This sensor is the front camera on QT8660.
@@ -28,7 +49,7 @@ config MT9D113
 config MT9D112
 	bool "Sensor mt9d112 (YUV 2M)"
 	depends on MSM_CAMERA && !ARCH_MSM8X60 && !ARCH_MSM8960 && !MSM_CAMERA_V4L2
-	default y
+	default n
 	---help---
 	  MICRON 2M YUV Sensor
 config IMX074
@@ -56,7 +77,7 @@ config MT9M114
 config WEBCAM_OV7692
 	bool "Sensor OV7692 (VGA YUV)"
 	depends on MSM_CAMERA && ARCH_MSM8X60 && !MSM_CAMERA_V4L2
-	default y
+	default n
 	---help---
 	  Omni Vision VGA YUV Sensor.
 config WEBCAM_OV9726
@@ -70,19 +91,19 @@ config WEBCAM_OV9726
 config VX6953
 	bool "Sensor VX6953 (BAYER 5M)"
 	depends on MSM_CAMERA && (ARCH_MSM7X30 || ARCH_MSM8X60) && !MSM_CAMERA_V4L2
-	default y
+	default n
 	---help---
 	STM 5M Bayer Sensor with EDOF
 config SN12M0PZ
 	bool "Sensor sn12m0pz (Bayer 12 MP)"
 	depends on MSM_CAMERA && ARCH_MSM7X30 && !MSM_CAMERA_V4L2
-	default y
+	default n
 	---help---
 	  Sony 12 MP Bayer Sensor
 config MT9P012
 	bool "Sensor mt9p012 (BAYER 5M)"
 	depends on MSM_CAMERA && !ARCH_MSM8X60 && !MSM_CAMERA_V4L2
-	default y
+	default n
 	---help---
 	  MICRON 5M Bayer Sensor with Autofocus
 
@@ -106,13 +127,13 @@ endchoice
 config MT9P012_KM
 	bool "Sensor mt9p012 KM module (BAYER 5M)"
 	depends on MSM_CAMERA && !ARCH_MSM8X60 && !MSM_CAMERA_V4L2
-	default y
+	default n
 	---help---
 	  MICRON 5M Bayer Sensor KM modules with Autofocus
 
 config MT9E013
 	bool "Sensor mt9e013 module (BAYER 8M)"
-	depends on MSM_CAMERA && (ARCH_MSM7X30 || ARCH_MSM8X60 || ARCH_MSM7X27A)
+	depends on MSM_CAMERA && (ARCH_MSM7X30 || ARCH_MSM8X60 || ARCH_MSM7X27A || ARCH_MSM8960)
 	default n
 	---help---
 	  Aptina 8M Bayer Sensor modules with Autofocus
@@ -123,17 +144,30 @@ config IMX074_ACT
 	---help---
 	Actuator for SONY 13.5 MP Bayer Sensor
 
+config MT9E013_ACT
+	bool "Actuator mt9e013 module (BAYER 8M)"
+	depends on MSM_CAMERA
+	---help---
+	Aptina 8M Bayer Sensor modules with Autofocus
+
+config IMX111_ACT
+	bool "Actuator imx111 (BAYER 8M)"
+	depends on MSM_CAMERA && ARCH_MSM8960
+	default n
+	---help---
+	Actuator for SONY 8 MP Bayer Sensor
+
 config S5K3E2FX
 	bool "Sensor s5k3e2fx (Samsung 5M)"
 	depends on MSM_CAMERA && !ARCH_MSM8X60 && !MSM_CAMERA_V4L2
-	default y
+	default n
 	---help---
 	  Samsung 5M with Autofocus
 
 config QS_S5K4E1
 	bool "Sensor qs_s5k4e1 (Samsung 5M)"
 	depends on MSM_CAMERA && ARCH_MSM8X60 && !MSM_CAMERA_V4L2
-	default y
+	default n
 	---help---
 	  Samsung 5M with Autofocus
 
@@ -177,6 +211,13 @@ config OV2720
 	bool "Sensor ov2720 (Omnivision 2MP)"
 	depends on MSM_CAMERA
 
+config IMX111
+	bool "Sensor IMX111 (Sony 8MP)"
+	depends on MSM_CAMERA && ARCH_MSM8960
+	default n
+	---help---
+	  Sony 2D 8M with Autofocus
+
 config VB6801
 	bool "Sensor vb6801"
 	depends on MSM_CAMERA && !ARCH_MSM8X60 && !MSM_CAMERA_V4L2
@@ -186,7 +227,7 @@ config VB6801
 config MSM_CAMERA_FLASH
 	bool "Qualcomm MSM camera flash support"
 	depends on MSM_CAMERA
-	default y
+	default n
 	---help---
 	  Enable support for LED flash for msm camera
 
@@ -208,14 +249,14 @@ config MSM_GEMINI
 config MSM_VPE
 	tristate "Qualcomm MSM Video Pre-processing Engine support"
 	depends on MSM_CAMERA && (ARCH_MSM7X30 || ARCH_MSM8X60)
-	default y
+	default n
 	---help---
 	  Enable support for Video Pre-processing Engine
 
 config QUP_EXCLUSIVE_TO_CAMERA
 	bool "QUP exclusive to camera"
 	depends on MSM_CAMERA
-	default y
+	default n
 	---help---
 	  This flag enabled states that QUP
 	  is exclusive to camera. In case this

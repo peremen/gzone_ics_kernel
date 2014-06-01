@@ -9,8 +9,16 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
+
 
 #include "msm_actuator.h"
+#include <linux/debugfs.h>
+
+static int msm_actuator_debug_init(struct msm_actuator_ctrl_t *a_ctrl);
 
 int32_t msm_actuator_write_focus(
 	struct msm_actuator_ctrl_t *a_ctrl,
@@ -27,6 +35,9 @@ int32_t msm_actuator_write_focus(
 	damping_code_step = damping_params->damping_step;
 	wait_time = damping_params->damping_delay;
 
+	CDBG("%s: damping_code_step:%d, wait_time:%d, code_bound:%d\n",
+		__func__, damping_code_step, wait_time, code_boundary);
+
 	/* Write code based on damping_code_step in a loop */
 	for (next_lens_pos =
 		curr_lens_pos + (sign_direction * damping_code_step);
@@ -38,6 +49,12 @@ int32_t msm_actuator_write_focus(
 		rc = a_ctrl->func_tbl.
 			actuator_i2c_write(a_ctrl, next_lens_pos,
 				damping_params->hw_params);
+
+        if(rc != next_lens_pos){
+			pr_err("%s: X actuator_i2c_write failed  rc=%d\n",__func__,-EINVAL);
+            return -EINVAL;
+        }
+
 		curr_lens_pos = next_lens_pos;
 		usleep(wait_time);
 	}
@@ -46,6 +63,11 @@ int32_t msm_actuator_write_focus(
 		rc = a_ctrl->func_tbl.
 			actuator_i2c_write(a_ctrl, code_boundary,
 				damping_params->hw_params);
+
+        if(rc != code_boundary){
+            return -EINVAL;
+        }
+
 		usleep(wait_time);
 	}
 	return rc;
@@ -102,15 +124,23 @@ int32_t msm_actuator_move_focus(
 	/* Determine scenario */
 	scenario_size = a_ctrl->scenario_size[dir];
 	for (index = 0; index < scenario_size; index++) {
+		CDBG("%s: scenario_index:%d\n", __func__, index);
 		if (num_steps <= a_ctrl->ringing_scenario[dir][index]) {
 			curr_scene = index;
+			CDBG("%s: scenario selected:%d\n", __func__,
+				a_ctrl->ringing_scenario[dir][index]);
 			break;
 		}
 	}
 
+
+	if(a_ctrl->step_position_table == NULL){
+		pr_err("%s: step_position_table failed (null)\n",__func__);
+		return -EINVAL;
+	}
+
+
 	curr_lens_pos = a_ctrl->step_position_table[a_ctrl->curr_step_pos];
-	CDBG("curr_step_pos =%d dest_step_pos =%d curr_lens_pos=%d\n",
-		a_ctrl->curr_step_pos, dest_step_pos, curr_lens_pos);
 
 	while (a_ctrl->curr_step_pos != dest_step_pos) {
 		step_boundary =
@@ -122,7 +152,18 @@ int32_t msm_actuator_move_focus(
 			target_step_pos = dest_step_pos;
 			target_lens_pos =
 				a_ctrl->step_position_table[target_step_pos];
-			curr_lens_pos = a_ctrl->func_tbl.
+
+
+
+
+
+
+
+
+
+
+
+			rc = a_ctrl->func_tbl.
 				actuator_write_focus(
 					a_ctrl,
 					curr_lens_pos,
@@ -132,11 +173,28 @@ int32_t msm_actuator_move_focus(
 					sign_dir,
 					target_lens_pos);
 
+            if(rc < 0){
+                return -EINVAL;
+            } else {
+                curr_lens_pos = (uint16_t)rc;
+            }
+
 		} else {
 			target_step_pos = step_boundary;
 			target_lens_pos =
 				a_ctrl->step_position_table[target_step_pos];
-			curr_lens_pos = a_ctrl->func_tbl.
+
+
+
+
+
+
+
+
+
+
+
+			rc = a_ctrl->func_tbl.
 				actuator_write_focus(
 					a_ctrl,
 					curr_lens_pos,
@@ -145,6 +203,12 @@ int32_t msm_actuator_move_focus(
 						ringing_params[curr_scene]),
 					sign_dir,
 					target_lens_pos);
+
+            if(rc < 0){
+                return -EINVAL;
+            } else {
+                curr_lens_pos = (uint16_t)rc;
+            }
 
 			a_ctrl->curr_region_index += sign_dir;
 		}
@@ -159,7 +223,13 @@ int32_t msm_actuator_init_table(
 {
 	int16_t code_per_step = 0;
 	int32_t rc = 0;
-	int16_t cur_code = 0;
+
+
+	int32_t cur_code = 0;
+
+
+
+
 	int16_t step_index = 0, region_index = 0;
 	uint16_t step_boundary = 0;
 	LINFO("%s called\n", __func__);
@@ -177,6 +247,11 @@ int32_t msm_actuator_init_table(
 	}
 	cur_code = a_ctrl->initial_code;
 	a_ctrl->step_position_table[step_index++] = cur_code;
+
+
+	cur_code = cur_code << 8;
+
+
 	for (region_index = 0;
 		region_index < a_ctrl->region_size;
 		region_index++) {
@@ -195,7 +270,13 @@ int32_t msm_actuator_init_table(
 		for (; step_index <= step_boundary;
 			step_index++) {
 			cur_code += code_per_step;
-			a_ctrl->step_position_table[step_index] = cur_code;
+
+
+			a_ctrl->step_position_table[step_index] = cur_code >> 8;
+
+
+
+
 		}
 	}
 	for (step_index = 0;
@@ -218,11 +299,23 @@ int32_t msm_actuator_set_default_focus(
 	int32_t rc = 0;
 	LINFO("%s called\n", __func__);
 
-	if (!a_ctrl->step_position_table) {
-		rc = a_ctrl->func_tbl.actuator_init_table(a_ctrl);
-		if (rc < 0)
-			return rc;
-	}
+
+	if (!a_ctrl->step_position_table){
+		if(a_ctrl->func_tbl.actuator_init_table){
+			rc = a_ctrl->func_tbl.actuator_init_table(a_ctrl);
+	        if(rc < 0){
+				pr_err("%s: actuator_init_table failed rc = %d\n",__func__,rc);
+	            return rc;
+			}
+        }
+    }
+
+
+
+
+
+
+
 
 	if (a_ctrl->curr_step_pos != 0)
 		rc = a_ctrl->func_tbl.actuator_move_focus(a_ctrl, MOVE_FAR,
@@ -237,20 +330,38 @@ int32_t msm_actuator_af_power_down(struct msm_actuator_ctrl_t *a_ctrl)
 	int32_t rc = 0;
 	LINFO("%s called\n", __func__);
 
-	if (!a_ctrl || !a_ctrl->step_position_table) {
-		LINFO("%s Actuator not initialized fully, returning",
-			__func__);
+
+	if((a_ctrl == NULL) || (a_ctrl->step_position_table == NULL)){
+		pr_err("%s: failed null pointer\n",__func__);
 		return rc;
 	}
-
 	if (a_ctrl->step_position_table[a_ctrl->curr_step_pos] !=
 		a_ctrl->initial_code) {
-		rc = a_ctrl->func_tbl.actuator_set_default_focus(a_ctrl);
+		if(a_ctrl->func_tbl.actuator_set_default_focus){
+			rc = a_ctrl->func_tbl.actuator_set_default_focus(a_ctrl);
+		}
 		LINFO("%s after msm_actuator_set_default_focus\n", __func__);
 	}
 	kfree(a_ctrl->step_position_table);
 	a_ctrl->step_position_table = NULL;
+
 	return rc;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 int32_t msm_actuator_config(
@@ -354,5 +465,57 @@ int32_t msm_actuator_create_subdevice(struct msm_actuator_ctrl_t *a_ctrl,
 		a_ctrl->i2c_client.client,
 		a_ctrl->act_v4l2_subdev_ops);
 
+	msm_actuator_debug_init(a_ctrl);
+
 	return rc;
 }
+
+static int msm_actuator_get_move(void *data, u64 *val)
+{
+	struct msm_actuator_ctrl_t *a_ctrl = (struct msm_actuator_ctrl_t *)data;
+	int32_t rc = 0;
+
+
+	rc = a_ctrl->func_tbl.actuator_set_default_focus(a_ctrl);
+    
+    if(rc < 0){
+        return -EFAULT;
+    }
+
+	return 0;
+}
+
+static int msm_actuator_set_move(void *data, u64 val)
+{
+	struct msm_actuator_ctrl_t *a_ctrl = (struct msm_actuator_ctrl_t *)data;
+	int32_t rc = 0;
+
+
+
+
+	rc = a_ctrl->func_tbl.actuator_move_focus(a_ctrl, (val & 0xFF00) >> 8,
+		(val & 0xFF));
+
+    if(rc < 0){
+        return -EFAULT;
+    }
+
+	return 0;
+}
+
+	DEFINE_SIMPLE_ATTRIBUTE(af_move,
+		msm_actuator_get_move, msm_actuator_set_move, "%llu\n");
+
+static int msm_actuator_debug_init(struct msm_actuator_ctrl_t *a_ctrl)
+{
+	struct dentry *debugfs_base = debugfs_create_dir("msm_actuator", NULL);
+	if (!debugfs_base)
+		return -ENOMEM;
+
+	if (!debugfs_create_file("af_move", S_IRUGO | S_IWUSR,
+		debugfs_base, (void *)a_ctrl, &af_move))
+		return -ENOMEM;
+
+	return 0;
+}
+

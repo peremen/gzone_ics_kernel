@@ -21,6 +21,10 @@
    COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
    SOFTWARE IS DISCLAIMED.
 */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #ifndef __BLUETOOTH_H
 #define __BLUETOOTH_H
@@ -103,11 +107,17 @@ struct bt_power {
 
 #define BT_LE_SCAN_WINDOW_MIN		0x0004
 #define BT_LE_SCAN_WINDOW_MAX		0x4000
-#define BT_LE_SCAN_WINDOW_DEF		0x0004
+
+
+#define BT_LE_SCAN_WINDOW_DEF		0x0012
+
 
 #define BT_LE_SCAN_INTERVAL_MIN		0x0004
 #define BT_LE_SCAN_INTERVAL_MAX		0x4000
-#define BT_LE_SCAN_INTERVAL_DEF		0x0008
+
+
+#define BT_LE_SCAN_INTERVAL_DEF		0x0800
+
 
 #define BT_LE_CONN_INTERVAL_MIN		0x0006
 #define BT_LE_CONN_INTERVAL_MAX		0x0C80

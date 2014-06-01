@@ -9,6 +9,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #define pr_fmt(fmt) "%s: " fmt, __func__
 
@@ -148,7 +152,13 @@ static struct scalable scalable_8960[] = {
 			.vreg[VREG_DIG]  = { "krait0_dig", 1150000,
 					     RPM_VREG_VOTER1,
 					     RPM_VREG_ID_PM8921_S3 },
-			.vreg[VREG_HFPLL_A] = { "hfpll", 2100000,
+		    
+
+			.vreg[VREG_HFPLL_A] = { "hfpll", 2050000,
+
+
+
+			
 					     RPM_VREG_VOTER1,
 					     RPM_VREG_ID_PM8921_S8 },
 			.vreg[VREG_HFPLL_B] = { "hfpll", 1800000,
@@ -166,7 +176,13 @@ static struct scalable scalable_8960[] = {
 			.vreg[VREG_DIG]  = { "krait0_dig", 1150000,
 					     RPM_VREG_VOTER2,
 					     RPM_VREG_ID_PM8921_S3 },
-			.vreg[VREG_HFPLL_A] = { "hfpll", 2100000,
+			
+
+			.vreg[VREG_HFPLL_A] = { "hfpll", 2050000,
+
+
+
+			
 					     RPM_VREG_VOTER2,
 					     RPM_VREG_ID_PM8921_S8 },
 			.vreg[VREG_HFPLL_B] = { "hfpll", 1800000,
@@ -177,7 +193,13 @@ static struct scalable scalable_8960[] = {
 			.hfpll_base   = MSM_HFPLL_BASE    + 0x400,
 			.aux_clk_sel  = MSM_APCS_GCC_BASE + 0x028,
 			.l2cpmr_iaddr = L2CPMR_IADDR,
-			.vreg[VREG_HFPLL_A] = { "hfpll", 2100000,
+			
+
+			.vreg[VREG_HFPLL_A] = { "hfpll", 2050000,
+
+
+
+			
 					     RPM_VREG_VOTER6,
 					     RPM_VREG_ID_PM8921_S8 },
 			.vreg[VREG_HFPLL_B] = { "hfpll", 1800000,
@@ -744,18 +766,50 @@ static void hfpll_enable(struct scalable *sc)
 	int rc;
 
 	if (cpu_is_msm8960() || cpu_is_msm8930() || cpu_is_msm8627()) {
+        
+
 		rc = rpm_vreg_set_voltage(sc->vreg[VREG_HFPLL_A].rpm_vreg_id,
 				sc->vreg[VREG_HFPLL_A].rpm_vreg_voter, 2050000,
 				sc->vreg[VREG_HFPLL_A].max_vdd, 0);
+
+
+
+
+
+
+
 		if (rc)
 			pr_err("%s regulator enable failed (%d)\n",
 				sc->vreg[VREG_HFPLL_A].name, rc);
+	
+		
 		rc = rpm_vreg_set_voltage(sc->vreg[VREG_HFPLL_B].rpm_vreg_id,
 				sc->vreg[VREG_HFPLL_B].rpm_vreg_voter, 1800000,
 				sc->vreg[VREG_HFPLL_B].max_vdd, 0);
+
+
+
+
+
+
+		
 		if (rc)
 			pr_err("%s regulator enable failed (%d)\n",
 				sc->vreg[VREG_HFPLL_B].name, rc);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	}
 
 	/* Disable PLL bypass mode. */

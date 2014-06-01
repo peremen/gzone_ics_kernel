@@ -3,6 +3,10 @@
 # or OTG-capable configurations when OTG transceivers or controllers
 # are used.
 #
+#/***********************************************************************/
+#/* Modified by                                                         */
+#/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+#/***********************************************************************/
 
 comment "OTG and related infrastructure"
 
@@ -148,6 +152,14 @@ config USB_MSM_OTG
 	  mode configurations.
 	  This driver is not supported on boards like trout which
 	  has an external PHY.
+
+
+config C811_DONT_USE_USB_ID
+	bool "Don't use usb id."
+	depends on (USB_MSM_OTG || USB_MSM_OTG_72K) && ARCH_MSM
+	default n
+	help
+	  Don't use usb id.
 
 config USB_MSM_ACA
 	bool "Support for Accessory Charger Adapter (ACA)"

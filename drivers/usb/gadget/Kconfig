@@ -12,6 +12,10 @@
 # With help from a special transceiver and a "Mini-AB" jack, systems with
 # both kinds of controller can also support "USB On-the-Go" (CONFIG_USB_OTG).
 #
+#/***********************************************************************/
+#/* Modified by                                                         */
+#/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+#/***********************************************************************/
 
 menuconfig USB_GADGET
 	tristate "USB Gadget Support"
@@ -961,6 +965,19 @@ config USB_G_ANDROID
 	  The functions can be configured via a board file and may be
 	  enabled and disabled dynamically.
 
+
+config DVE072_USB_MASS_STORAGE
+	boolean "DVE072 USB Mass Storage"
+	depends on USB_G_ANDROID
+	help
+	  DVE072 Support for multiple usb mass storage.
+
+
+config DVE072_ZERO_CD
+	boolean "DVE072 Zero CD"
+	depends on USB_G_ANDROID
+	help
+	  DVE072 Support for zero cd.
 config USB_CDC_COMPOSITE
 	tristate "CDC Composite Device (Ethernet and ACM)"
 	depends on NET

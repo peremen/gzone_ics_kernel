@@ -10,6 +10,10 @@
  * GNU General Public License for more details.
  *
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 /*
  * QUP driver for Qualcomm MSM platforms
  *
@@ -206,8 +210,8 @@ qup_i2c_interrupt(int irq, void *devid)
 	}
 
 	if (status & I2C_STATUS_ERROR_MASK) {
-		dev_err(dev->dev, "QUP: I2C status flags :0x%x, irq:%d\n",
-			status, irq);
+
+
 		err = status;
 		/* Clear Error interrupt if it's a level triggered interrupt*/
 		if (dev->num_irqs == 1) {
@@ -991,9 +995,9 @@ timeout_err:
 			if (dev->err) {
 				if (dev->err > 0 &&
 					dev->err & QUP_I2C_NACK_FLAG) {
-					dev_err(dev->dev,
-					"I2C slave addr:0x%x not connected\n",
-					dev->msg->addr);
+
+
+
 					dev->err = ENOTCONN;
 				} else if (dev->err < 0) {
 					dev_err(dev->dev,

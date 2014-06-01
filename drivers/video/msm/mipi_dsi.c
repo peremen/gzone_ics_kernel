@@ -10,6 +10,10 @@
  * GNU General Public License for more details.
  *
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -30,10 +34,18 @@
 #include <mach/gpio.h>
 #include <mach/clk.h>
 
+#include <mach/board_DVE073.h>
+
 #include "msm_fb.h"
 #include "mipi_dsi.h"
 #include "mdp.h"
 #include "mdp4.h"
+
+#define PM8921_GPIO_BASE		NR_GPIO_IRQS
+#define PM8921_GPIO_PM_TO_SYS(pm_gpio)	(pm_gpio - 1 + PM8921_GPIO_BASE)
+
+
+#define MIPI_DSI_NEXT_DEV_MDP_ID  0x80201
 
 u32 dsi_irq;
 
@@ -187,7 +199,14 @@ static int mipi_dsi_on(struct platform_device *pdev)
 	width = mfd->panel_info.xres;
 	height = mfd->panel_info.yres;
 
+
+ if(system_state == SYSTEM_BOOTING) {
+	mipi_dsi_phy_ctrl(0);
+	mdelay(1);
 	mipi_dsi_phy_ctrl(1);
+ } else {
+	mipi_dsi_phy_ctrl(1);
+ }
 
 	if (mdp_rev == MDP_REV_42 && mipi_dsi_pdata)
 		target_type = mipi_dsi_pdata->target_type;

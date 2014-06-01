@@ -13,6 +13,10 @@
  * GNU General Public License for more details.
  *
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #ifndef __ARCH_ARM_MACH_MSM_DEVICES_H
 #define __ARCH_ARM_MACH_MSM_DEVICES_H
@@ -54,9 +58,16 @@ extern struct platform_device msm8960_device_uart_gsbi5;
 extern struct platform_device msm8960_device_ssbi_pmic;
 extern struct platform_device msm8960_device_qup_i2c_gsbi3;
 extern struct platform_device msm8960_device_qup_i2c_gsbi4;
+
+extern struct platform_device msm8960_device_qup_i2c_gsbi8;
+
 extern struct platform_device msm8960_device_qup_i2c_gsbi10;
 extern struct platform_device msm8960_device_qup_i2c_gsbi12;
-extern struct platform_device msm8960_device_qup_spi_gsbi1;
+
+
+
+extern struct platform_device msm8960_device_qup_i2c_gsbi1;
+
 extern struct platform_device msm8960_gemini_device;
 extern struct platform_device msm8960_device_csiphy0;
 extern struct platform_device msm8960_device_csiphy1;
@@ -251,13 +262,13 @@ extern struct platform_device msm_rpm_stat_device;
 extern struct platform_device msm_device_rng;
 extern struct platform_device apq8064_device_rng;
 
-#if defined(CONFIG_CRYPTO_DEV_QCRYPTO) || \
-		defined(CONFIG_CRYPTO_DEV_QCRYPTO_MODULE)
+#if defined(CONFIG_CRYPTO_DEV_QCRYPTO) || 		defined(CONFIG_CRYPTO_DEV_QCRYPTO_MODULE)
+
 extern struct platform_device msm9615_qcrypto_device;
 #endif
 
-#if defined(CONFIG_CRYPTO_DEV_QCEDEV) || \
-		defined(CONFIG_CRYPTO_DEV_QCEDEV_MODULE)
+#if defined(CONFIG_CRYPTO_DEV_QCEDEV) || 		defined(CONFIG_CRYPTO_DEV_QCEDEV_MODULE)
+
 extern struct platform_device msm9615_qcedev_device;
 #endif
 extern struct platform_device msm8960_device_watchdog;

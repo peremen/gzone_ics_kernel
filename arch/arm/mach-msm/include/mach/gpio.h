@@ -13,6 +13,10 @@
  * GNU General Public License for more details.
  *
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 #ifndef __ASM_ARCH_MSM_GPIO_H
 #define __ASM_ARCH_MSM_GPIO_H
 
@@ -23,7 +27,6 @@
 #include <linux/interrupt.h>
 #include <asm-generic/gpio.h>
 #include <mach/irqs.h>
-
 #define FIRST_BOARD_GPIO	NR_GPIO_IRQS
 
 extern struct irq_chip msm_gpio_irq_extn;

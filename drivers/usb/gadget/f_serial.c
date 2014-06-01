@@ -9,6 +9,10 @@
  * Public License ("GPL") as published by the Free Software Foundation,
  * either version 2 of that License or (at your option) any later version.
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #include <linux/slab.h>
 #include <linux/kernel.h>
@@ -103,7 +107,11 @@ static inline struct f_gser *port_to_gser(struct gserial *p)
 	return container_of(p, struct f_gser, port);
 }
 #define GS_LOG2_NOTIFY_INTERVAL		5	/* 1 << 5 == 32 msec */
-#define GS_NOTIFY_MAXPACKET		10	/* notification + 2 bytes */
+
+#define GS_NOTIFY_MAXPACKET		0x10
+
+
+
 #endif
 /*-------------------------------------------------------------------------*/
 
@@ -119,8 +127,13 @@ static struct usb_interface_descriptor gser_interface_desc = {
 	.bNumEndpoints =	2,
 #endif
 	.bInterfaceClass =	USB_CLASS_VENDOR_SPEC,
+
+
+
+
 	.bInterfaceSubClass =	0,
 	.bInterfaceProtocol =	0,
+
 	/* .iInterface = DYNAMIC */
 };
 #ifdef CONFIG_MODEM_SUPPORT

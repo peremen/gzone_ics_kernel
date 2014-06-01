@@ -15,6 +15,10 @@
  * Rewrote bits to get rid of console_lock
  *	01Mar01 Andrew Morton
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #include <linux/kernel.h>
 #include <linux/mm.h>
@@ -926,6 +930,10 @@ asmlinkage int vprintk(const char *fmt, va_list args)
 
 
 	p = printk_buf;
+
+
+	save_kernel_panic_log(p);
+
 
 	/* Read log level and handle special printk prefix */
 	plen = log_prefix(p, &current_log_level, &special);

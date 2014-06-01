@@ -9,6 +9,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #include <linux/uaccess.h>
 #include <linux/interrupt.h>
@@ -3887,7 +3891,9 @@ int msm_vfe_subdev_init(struct v4l2_subdev *sd, void *data,
 	vfe32_ctrl->update_gamma = false;
 	vfe32_ctrl->hfr_mode = HFR_MODE_OFF;
 
-	enable_irq(vfe32_ctrl->vfeirq->start);
+
+
+
 
 	vfe32_ctrl->vfebase = ioremap(vfe32_ctrl->vfemem->start,
 		resource_size(vfe32_ctrl->vfemem));
@@ -3930,6 +3936,10 @@ int msm_vfe_subdev_init(struct v4l2_subdev *sd, void *data,
 	else
 		vfe32_ctrl->register_total = VFE33_REGISTER_TOTAL;
 
+
+	enable_irq(vfe32_ctrl->vfeirq->start);
+
+
 	return rc;
 
 vfe_clk_enable_failed:
@@ -3966,6 +3976,11 @@ void msm_vfe_subdev_release(struct platform_device *pdev)
 	msm_camio_bus_scale_cfg(
 		sync->sdata->pdata->cam_bus_scale_table, S_EXIT);
 	vfe_syncdata = NULL;
+
+
+	vfe32_ctrl->register_total = 0;
+
+
 }
 
 static int __devinit vfe32_probe(struct platform_device *pdev)

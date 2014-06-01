@@ -10,6 +10,10 @@
  *
  *  You may use this code as per GPL version 2
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #include <linux/ctype.h>
 #include <linux/power_supply.h>
@@ -172,7 +176,10 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(time_to_full_avg),
 	POWER_SUPPLY_ATTR(type),
 	POWER_SUPPLY_ATTR(scope),
+	
+	POWER_SUPPLY_ATTR(batt_id),
 	/* Properties of type `const char *' */
+	POWER_SUPPLY_ATTR(cradle_status),
 	POWER_SUPPLY_ATTR(model_name),
 	POWER_SUPPLY_ATTR(manufacturer),
 	POWER_SUPPLY_ATTR(serial_number),

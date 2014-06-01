@@ -1,3 +1,8 @@
+#/**********************************************************************
+#* File Name: sound/soc/codecs/Makefile
+#* 
+#* (C) NEC CASIO Mobile Communications, Ltd. 2013
+#**********************************************************************/
 snd-soc-88pm860x-objs := 88pm860x-codec.o
 snd-soc-ac97-objs := ac97.o
 snd-soc-ad1836-objs := ad1836.o
@@ -39,6 +44,10 @@ snd-soc-twl6040-objs := twl6040.o
 snd-soc-uda134x-objs := uda134x.o
 snd-soc-uda1380-objs := uda1380.o
 snd-soc-wcd9310-objs := wcd9310.o wcd9310-tables.o
+
+snd-soc-DVE073-objs := yda160.o D4NP2_Ctrl.o
+
+snd-soc-es310-objs := es310.o
 snd-soc-wl1273-objs := wl1273.o
 snd-soc-wm1250-ev1-objs := wm1250-ev1.o
 snd-soc-wm8350-objs := wm8350.o
@@ -133,6 +142,10 @@ obj-$(CONFIG_SND_SOC_TWL6040)	+= snd-soc-twl6040.o
 obj-$(CONFIG_SND_SOC_UDA134X)	+= snd-soc-uda134x.o
 obj-$(CONFIG_SND_SOC_UDA1380)	+= snd-soc-uda1380.o
 obj-$(CONFIG_SND_SOC_WCD9310)	+= snd-soc-wcd9310.o
+
+obj-$(CONFIG_SND_SOC_DVE072)	+= snd-soc-DVE073.o
+
+obj-$(CONFIG_SND_SOC_ES310)	+= snd-soc-es310.o	
 obj-$(CONFIG_SND_SOC_WL1273)	+= snd-soc-wl1273.o
 obj-$(CONFIG_SND_SOC_WM1250_EV1) += snd-soc-wm1250-ev1.o
 obj-$(CONFIG_SND_SOC_WM8350)	+= snd-soc-wm8350.o

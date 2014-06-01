@@ -9,6 +9,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 #include <linux/irq.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
@@ -1749,6 +1753,7 @@ static int __devinit msm_slim_probe(struct platform_device *pdev)
 	dev->ctrl.clkgear = SLIM_MAX_CLK_GEAR;
 	dev->ctrl.dev.parent = &pdev->dev;
 
+	dev->wr_comp = NULL;			 
 	ret = request_irq(dev->irq, msm_slim_interrupt, IRQF_TRIGGER_HIGH,
 				"msm_slim_irq", dev);
 	if (ret) {

@@ -1,3 +1,7 @@
+#/***********************************************************************/
+#/* Modified by                                                         */
+#/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+#/***********************************************************************/
 # Helper to resolve issues with configs that have SPI enabled but I2C
 # modular, meaning we can't build the codec driver in with I2C support.
 # We use an ordered list of conditional defaults to pick the appropriate
@@ -53,6 +57,10 @@ config SND_SOC_ALL_CODECS
 	select SND_SOC_TWL6040 if TWL4030_CORE
 	select SND_SOC_UDA134X
 	select SND_SOC_UDA1380 if I2C
+	
+	select SND_SOC_DVE072 if DVE072_AUDIO
+	
+	select SND_SOC_ES310 if DVE072_AUDIO
 	select SND_SOC_WL1273 if MFD_WL1273_CORE
 	select SND_SOC_WM1250_EV1 if I2C
 	select SND_SOC_WM2000 if I2C
@@ -252,6 +260,14 @@ config SND_SOC_UDA1380
 
 config SND_SOC_WCD9310
         tristate
+
+
+config SND_SOC_DVE072
+        tristate
+
+
+config SND_SOC_ES310
+	tristate
 
 config SND_SOC_WL1273
 	tristate

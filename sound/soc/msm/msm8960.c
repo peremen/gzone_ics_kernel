@@ -9,6 +9,10 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #include <linux/clk.h>
 #include <linux/delay.h>
@@ -28,6 +32,14 @@
 #include <linux/mfd/wcd9310/core.h>
 #include "msm-pcm-routing.h"
 #include "../codecs/wcd9310.h"
+
+
+#include "../codecs/es310.h" 
+#include <../codecs/yda160.h>
+
+
+#include <mach/board_DVE073.h> 
+
 
 /* 8960 machine driver */
 
@@ -61,12 +73,16 @@
 
 #define JACK_DETECT_GPIO 38
 #define JACK_DETECT_INT PM8921_GPIO_IRQ(PM8921_IRQ_BASE, JACK_DETECT_GPIO)
+#define GPIO_DETECT_USED true	
 
 static u32 top_spk_pamp_gpio  = PM8921_GPIO_PM_TO_SYS(18);
 static u32 bottom_spk_pamp_gpio = PM8921_GPIO_PM_TO_SYS(19);
 static int msm8960_spk_control;
-static int msm8960_ext_bottom_spk_pamp;
-static int msm8960_ext_top_spk_pamp;
+
+
+
+
+
 static int msm8960_slim_0_rx_ch = 1;
 static int msm8960_slim_0_tx_ch = 1;
 
@@ -102,153 +118,169 @@ static struct tabla_mbhc_config mbhc_cfg = {
 	.mclk_rate = TABLA_EXT_CLK_RATE,
 	.gpio = 0,
 	.gpio_irq = 0,
-	.gpio_level_insert = 1,
+	.gpio_level_insert = 0,	
 };
 
 static struct mutex cdc_mclk_mutex;
 
-static void msm8960_enable_ext_spk_amp_gpio(u32 spk_amp_gpio)
-{
-	int ret = 0;
 
-	struct pm_gpio param = {
-		.direction      = PM_GPIO_DIR_OUT,
-		.output_buffer  = PM_GPIO_OUT_BUF_CMOS,
-		.output_value   = 1,
-		.pull      = PM_GPIO_PULL_NO,
-		.vin_sel	= PM_GPIO_VIN_S4,
-		.out_strength   = PM_GPIO_STRENGTH_MED,
-		.
-			function       = PM_GPIO_FUNC_NORMAL,
-	};
 
-	if (spk_amp_gpio == bottom_spk_pamp_gpio) {
 
-		ret = gpio_request(bottom_spk_pamp_gpio, "BOTTOM_SPK_AMP");
-		if (ret) {
-			pr_err("%s: Error requesting BOTTOM SPK AMP GPIO %u\n",
-				__func__, bottom_spk_pamp_gpio);
-			return;
-		}
-		ret = pm8xxx_gpio_config(bottom_spk_pamp_gpio, &param);
-		if (ret)
-			pr_err("%s: Failed to configure Bottom Spk Ampl"
-				" gpio %u\n", __func__, bottom_spk_pamp_gpio);
-		else {
-			pr_debug("%s: enable Bottom spkr amp gpio\n", __func__);
-			gpio_direction_output(bottom_spk_pamp_gpio, 1);
-		}
 
-	} else if (spk_amp_gpio == top_spk_pamp_gpio) {
 
-		ret = gpio_request(top_spk_pamp_gpio, "TOP_SPK_AMP");
-		if (ret) {
-			pr_err("%s: Error requesting GPIO %d\n", __func__,
-				top_spk_pamp_gpio);
-			return;
-		}
-		ret = pm8xxx_gpio_config(top_spk_pamp_gpio, &param);
-		if (ret)
-			pr_err("%s: Failed to configure Top Spk Ampl"
-				" gpio %u\n", __func__, top_spk_pamp_gpio);
-		else {
-			pr_debug("%s: enable Top spkr amp gpio\n", __func__);
-			gpio_direction_output(top_spk_pamp_gpio, 1);
-		}
-	} else {
-		pr_err("%s: ERROR : Invalid External Speaker Ampl GPIO."
-			" gpio = %u\n", __func__, spk_amp_gpio);
-		return;
-	}
-}
 
-static void msm8960_ext_spk_power_amp_on(u32 spk)
-{
-	if (spk & (BOTTOM_SPK_AMP_POS | BOTTOM_SPK_AMP_NEG)) {
 
-		if ((msm8960_ext_bottom_spk_pamp & BOTTOM_SPK_AMP_POS) &&
-			(msm8960_ext_bottom_spk_pamp & BOTTOM_SPK_AMP_NEG)) {
 
-			pr_debug("%s() External Bottom Speaker Ampl already "
-				"turned on. spk = 0x%08x\n", __func__, spk);
-			return;
-		}
 
-		msm8960_ext_bottom_spk_pamp |= spk;
 
-		if ((msm8960_ext_bottom_spk_pamp & BOTTOM_SPK_AMP_POS) &&
-			(msm8960_ext_bottom_spk_pamp & BOTTOM_SPK_AMP_NEG)) {
 
-			msm8960_enable_ext_spk_amp_gpio(bottom_spk_pamp_gpio);
-			pr_debug("%s: slepping 4 ms after turning on external "
-				" Bottom Speaker Ampl\n", __func__);
-			usleep_range(4000, 4000);
-		}
 
-	} else if (spk & (TOP_SPK_AMP_POS | TOP_SPK_AMP_NEG)) {
 
-		if ((msm8960_ext_top_spk_pamp & TOP_SPK_AMP_POS) &&
-			(msm8960_ext_top_spk_pamp & TOP_SPK_AMP_NEG)) {
 
-			pr_debug("%s() External Top Speaker Ampl already"
-				"turned on. spk = 0x%08x\n", __func__, spk);
-			return;
-		}
 
-		msm8960_ext_top_spk_pamp |= spk;
 
-		if ((msm8960_ext_top_spk_pamp & TOP_SPK_AMP_POS) &&
-			(msm8960_ext_top_spk_pamp & TOP_SPK_AMP_NEG)) {
 
-			msm8960_enable_ext_spk_amp_gpio(top_spk_pamp_gpio);
-			pr_debug("%s: sleeping 4 ms after turning on "
-				" external Top Speaker Ampl\n", __func__);
-			usleep_range(4000, 4000);
-		}
-	} else  {
 
-		pr_err("%s: ERROR : Invalid External Speaker Ampl. spk = 0x%08x\n",
-			__func__, spk);
-		return;
-	}
-}
 
-static void msm8960_ext_spk_power_amp_off(u32 spk)
-{
-	if (spk & (BOTTOM_SPK_AMP_POS | BOTTOM_SPK_AMP_NEG)) {
 
-		if (!msm8960_ext_bottom_spk_pamp)
-			return;
 
-		gpio_direction_output(bottom_spk_pamp_gpio, 0);
-		gpio_free(bottom_spk_pamp_gpio);
-		msm8960_ext_bottom_spk_pamp = 0;
 
-		pr_debug("%s: sleeping 4 ms after turning off external Bottom"
-			" Speaker Ampl\n", __func__);
 
-		usleep_range(4000, 4000);
 
-	} else if (spk & (TOP_SPK_AMP_POS | TOP_SPK_AMP_NEG)) {
 
-		if (!msm8960_ext_top_spk_pamp)
-			return;
 
-		gpio_direction_output(top_spk_pamp_gpio, 0);
-		gpio_free(top_spk_pamp_gpio);
-		msm8960_ext_top_spk_pamp = 0;
 
-		pr_debug("%s: sleeping 4 ms after turning off external Top"
-			" Spkaker Ampl\n", __func__);
 
-		usleep_range(4000, 4000);
-	} else  {
 
-		pr_err("%s: ERROR : Invalid Ext Spk Ampl. spk = 0x%08x\n",
-			__func__, spk);
-		return;
-	}
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 static void msm8960_ext_control(struct snd_soc_codec *codec)
 {
@@ -293,43 +325,46 @@ static int msm8960_set_spk(struct snd_kcontrol *kcontrol,
 	msm8960_ext_control(codec);
 	return 1;
 }
-static int msm8960_spkramp_event(struct snd_soc_dapm_widget *w,
-	struct snd_kcontrol *k, int event)
-{
-	pr_debug("%s() %x\n", __func__, SND_SOC_DAPM_EVENT_ON(event));
 
-	if (SND_SOC_DAPM_EVENT_ON(event)) {
-		if (!strncmp(w->name, "Ext Spk Bottom Pos", 18))
-			msm8960_ext_spk_power_amp_on(BOTTOM_SPK_AMP_POS);
-		else if (!strncmp(w->name, "Ext Spk Bottom Neg", 18))
-			msm8960_ext_spk_power_amp_on(BOTTOM_SPK_AMP_NEG);
-		else if (!strncmp(w->name, "Ext Spk Top Pos", 15))
-			msm8960_ext_spk_power_amp_on(TOP_SPK_AMP_POS);
-		else if  (!strncmp(w->name, "Ext Spk Top Neg", 15))
-			msm8960_ext_spk_power_amp_on(TOP_SPK_AMP_NEG);
-		else {
-			pr_err("%s() Invalid Speaker Widget = %s\n",
-					__func__, w->name);
-			return -EINVAL;
-		}
 
-	} else {
-		if (!strncmp(w->name, "Ext Spk Bottom Pos", 18))
-			msm8960_ext_spk_power_amp_off(BOTTOM_SPK_AMP_POS);
-		else if (!strncmp(w->name, "Ext Spk Bottom Neg", 18))
-			msm8960_ext_spk_power_amp_off(BOTTOM_SPK_AMP_NEG);
-		else if (!strncmp(w->name, "Ext Spk Top Pos", 15))
-			msm8960_ext_spk_power_amp_off(TOP_SPK_AMP_POS);
-		else if  (!strncmp(w->name, "Ext Spk Top Neg", 15))
-			msm8960_ext_spk_power_amp_off(TOP_SPK_AMP_NEG);
-		else {
-			pr_err("%s() Invalid Speaker Widget = %s\n",
-					__func__, w->name);
-			return -EINVAL;
-		}
-	}
-	return 0;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 static int msm8960_enable_codec_ext_clk(struct snd_soc_codec *codec, int enable,
 					bool dapm)
@@ -393,11 +428,13 @@ static const struct snd_soc_dapm_widget msm8960_dapm_widgets[] = {
 	SND_SOC_DAPM_SUPPLY("MCLK",  SND_SOC_NOPM, 0, 0,
 	msm8960_mclk_event, SND_SOC_DAPM_PRE_PMU | SND_SOC_DAPM_POST_PMD),
 
-	SND_SOC_DAPM_SPK("Ext Spk Bottom Pos", msm8960_spkramp_event),
-	SND_SOC_DAPM_SPK("Ext Spk Bottom Neg", msm8960_spkramp_event),
 
-	SND_SOC_DAPM_SPK("Ext Spk Top Pos", msm8960_spkramp_event),
-	SND_SOC_DAPM_SPK("Ext Spk Top Neg", msm8960_spkramp_event),
+
+
+
+
+
+
 
 	SND_SOC_DAPM_MIC("Handset Mic", NULL),
 	SND_SOC_DAPM_MIC("Headset Mic", NULL),
@@ -419,12 +456,14 @@ static const struct snd_soc_dapm_route common_audio_map[] = {
 	{"RX_BIAS", NULL, "MCLK"},
 	{"LDO_H", NULL, "MCLK"},
 
-	/* Speaker path */
-	{"Ext Spk Bottom Pos", NULL, "LINEOUT1"},
-	{"Ext Spk Bottom Neg", NULL, "LINEOUT3"},
 
-	{"Ext Spk Top Pos", NULL, "LINEOUT2"},
-	{"Ext Spk Top Neg", NULL, "LINEOUT4"},
+
+
+
+
+
+
+
 
 	/* Microphone path */
 	{"AMIC1", NULL, "MIC BIAS1 Internal1"},
@@ -636,7 +675,7 @@ static void *def_tabla_mbhc_cal(void)
 #undef S
 #define S(X, Y) ((TABLA_MBHC_CAL_PLUG_TYPE_PTR(tabla_cal)->X) = (Y))
 	S(v_no_mic, 30);
-	S(v_hs_max, 2400);
+	S(v_hs_max, 2700);	
 #undef S
 #define S(X, Y) ((TABLA_MBHC_CAL_BTN_DET_PTR(tabla_cal)->X) = (Y))
 	S(c[0], 62);
@@ -646,29 +685,38 @@ static void *def_tabla_mbhc_cal(void)
 	S(mbhc_nsc, 11);
 	S(n_btn_meas, 1);
 	S(n_btn_con, 2);
-	S(num_btn, TABLA_MBHC_DEF_BUTTONS);
+
+
+
+	S(num_btn, 1);
+
 	S(v_btn_press_delta_sta, 100);
 	S(v_btn_press_delta_cic, 50);
 #undef S
 	btn_cfg = TABLA_MBHC_CAL_BTN_DET_PTR(tabla_cal);
 	btn_low = tabla_mbhc_cal_btn_det_mp(btn_cfg, TABLA_BTN_DET_V_BTN_LOW);
 	btn_high = tabla_mbhc_cal_btn_det_mp(btn_cfg, TABLA_BTN_DET_V_BTN_HIGH);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	btn_low[0] = -50;
-	btn_high[0] = 20;
-	btn_low[1] = 21;
-	btn_high[1] = 62;
-	btn_low[2] = 63;
-	btn_high[2] = 104;
-	btn_low[3] = 105;
-	btn_high[3] = 143;
-	btn_low[4] = 144;
-	btn_high[4] = 181;
-	btn_low[5] = 182;
-	btn_high[5] = 218;
-	btn_low[6] = 219;
-	btn_high[6] = 254;
-	btn_low[7] = 255;
-	btn_high[7] = 330;
+	btn_high[0] = 330;
+
 	n_ready = tabla_mbhc_cal_btn_det_mp(btn_cfg, TABLA_BTN_DET_N_READY);
 	n_ready[0] = 80;
 	n_ready[1] = 68;
@@ -687,6 +735,9 @@ static int msm8960_audrx_init(struct snd_soc_pcm_runtime *rtd)
 	int err;
 	struct snd_soc_codec *codec = rtd->codec;
 	struct snd_soc_dapm_context *dapm = &codec->dapm;
+
+
+
 	struct pm_gpio jack_gpio_cfg = {
 		.direction = PM_GPIO_DIR_IN,
 		.pull = PM_GPIO_PULL_UP_1P5,
@@ -715,12 +766,27 @@ static int msm8960_audrx_init(struct snd_soc_pcm_runtime *rtd)
 	snd_soc_dapm_add_routes(dapm, common_audio_map,
 		ARRAY_SIZE(common_audio_map));
 
-	snd_soc_dapm_enable_pin(dapm, "Ext Spk Bottom Pos");
-	snd_soc_dapm_enable_pin(dapm, "Ext Spk Bottom Neg");
-	snd_soc_dapm_enable_pin(dapm, "Ext Spk Top Pos");
-	snd_soc_dapm_enable_pin(dapm, "Ext Spk Top Neg");
 
-	snd_soc_dapm_sync(dapm);
+
+
+
+
+
+
+
+
+
+    err = es310_add_controls(codec); 
+    if (err < 0)
+	{
+      pr_debug("es310_add_controls register fail \n");
+	}
+    err = yda160_add_controls(codec); 
+    if (err < 0)
+	{
+      pr_debug("es310_add_controls register fail \n");
+	}	
+
 
 	err = snd_soc_jack_new(codec, "Headset Jack",
 			       (SND_JACK_HEADSET | SND_JACK_OC_HPHL |
@@ -738,7 +804,27 @@ static int msm8960_audrx_init(struct snd_soc_pcm_runtime *rtd)
 		return err;
 	}
 
-	if (hs_detect_use_gpio) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	if (GPIO_DETECT_USED) {	
 		mbhc_cfg.gpio = PM8921_GPIO_PM_TO_SYS(JACK_DETECT_GPIO);
 		mbhc_cfg.gpio_irq = JACK_DETECT_INT;
 	}
@@ -751,9 +837,6 @@ static int msm8960_audrx_init(struct snd_soc_pcm_runtime *rtd)
 			return err;
 		}
 	}
-
-	mbhc_cfg.read_fw_bin = hs_detect_use_firmware;
-
 	err = tabla_hs_detect(codec, &mbhc_cfg);
 
 	return err;
@@ -786,13 +869,15 @@ static struct snd_soc_dsp_link bidir_hl_media = {
 	},
 };
 
-static struct snd_soc_dsp_link hdmi_rx_hl = {
-	.playback = true,
-	.trigger = {
-		SND_SOC_DSP_TRIGGER_POST,
-		SND_SOC_DSP_TRIGGER_POST
-	},
-};
+
+
+
+
+
+
+
+
+
 
 static int msm8960_slim_0_rx_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 			struct snd_pcm_hw_params *params)
@@ -838,22 +923,24 @@ static int msm8960_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 	return 0;
 }
 
-static int msm8960_hdmi_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
-					struct snd_pcm_hw_params *params)
-{
-	struct snd_interval *rate = hw_param_interval(params,
-					SNDRV_PCM_HW_PARAM_RATE);
 
-	struct snd_interval *channels = hw_param_interval(params,
-					SNDRV_PCM_HW_PARAM_CHANNELS);
 
-	pr_debug("%s channels->min %u channels->max %u ()\n", __func__,
-			channels->min, channels->max);
 
-	rate->min = rate->max = 48000;
 
-	return 0;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 static int msm8960_btsco_be_hw_params_fixup(struct snd_soc_pcm_runtime *rtd,
 					struct snd_pcm_hw_params *params)
@@ -1092,18 +1179,21 @@ static struct snd_soc_dai_link msm8960_dai_common[] = {
 		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
 		.ignore_suspend = 1,
 	},
-	/* HDMI Hostless */
-	{
-		.name = "HDMI_RX_HOSTLESS",
-		.stream_name = "HDMI_RX_HOSTLESS",
-		.cpu_dai_name = "HDMI_HOSTLESS",
-		.platform_name = "msm-pcm-hostless",
-		.dynamic = 1,
-		.dsp_link = &hdmi_rx_hl,
-		.no_host_mode = SND_SOC_DAI_LINK_NO_HOST,
-		.no_codec = 1,
-		.ignore_suspend = 1,
-	},
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/* Backend BT/FM DAI Links */
 	{
 		.name = LPASS_BE_INT_BT_SCO_RX,
@@ -1150,19 +1240,23 @@ static struct snd_soc_dai_link msm8960_dai_common[] = {
 		.be_id = MSM_BACKEND_DAI_INT_FM_TX,
 		.be_hw_params_fixup = msm8960_be_hw_params_fixup,
 	},
-	/* HDMI BACK END DAI Link */
-	{
-		.name = LPASS_BE_HDMI,
-		.stream_name = "HDMI Playback",
-		.cpu_dai_name = "msm-dai-q6-hdmi.8",
-		.platform_name = "msm-pcm-routing",
-		.codec_name     = "msm-stub-codec.1",
-		.codec_dai_name = "msm-stub-rx",
-		.no_pcm = 1,
-		.no_codec = 1,
-		.be_id = MSM_BACKEND_DAI_HDMI_RX,
-		.be_hw_params_fixup = msm8960_hdmi_be_hw_params_fixup,
-	},
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 	/* Backend AFE DAI Links */
 	{
 		.name = LPASS_BE_AFE_PCM_RX,

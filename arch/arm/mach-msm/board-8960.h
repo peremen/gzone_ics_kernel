@@ -9,6 +9,11 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
+
 
 #ifndef __ARCH_ARM_MACH_MSM_BOARD_MSM8960_H
 #define __ARCH_ARM_MACH_MSM_BOARD_MSM8960_H
@@ -75,6 +80,13 @@ extern struct sx150x_platform_data msm8960_sx150x_data[];
 extern struct msm_camera_board_info msm8960_camera_board_info;
 extern unsigned char hdmi_is_primary;
 
+
+extern struct msm_camera_board_info msm8960_camera_board_info_sub;
+
+
+
+
+int get_m7system_board_revision(void);
 void msm8960_init_cam(void);
 void msm8960_init_fb(void);
 void msm8960_init_pmic(void);
@@ -90,6 +102,12 @@ uint32_t msm_rpm_get_swfi_latency(void);
 		(socinfo_get_platform_subtype() == 1) \
 	)
 
+
+#define MSM_8960_GSBI1_QUP_I2C_BUS_ID 1
+
 #define MSM_8960_GSBI4_QUP_I2C_BUS_ID 4
 #define MSM_8960_GSBI3_QUP_I2C_BUS_ID 3
+
+#define MSM_8960_GSBI8_QUP_I2C_BUS_ID 8
+
 #define MSM_8960_GSBI10_QUP_I2C_BUS_ID 10

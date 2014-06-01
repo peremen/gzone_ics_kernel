@@ -19,6 +19,10 @@
    COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
    SOFTWARE IS DISCLAIMED.
 */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #include <net/bluetooth/bluetooth.h>
 #include <net/bluetooth/hci_core.h>
@@ -708,6 +712,10 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
 invalid_key:
 	hcon->sec_req = FALSE;
 
+	
+	
+	
+
 	skb_pull(skb, sizeof(*rp));
 
 	memset(&cp, 0, sizeof(cp));
@@ -754,7 +762,10 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
 	hcon->smp_conn = conn;
 	hcon->pending_sec_level = sec_level;
 
-	if ((hcon->link_mode & HCI_LM_MASTER) && !hcon->sec_req) {
+
+
+	if (hcon->link_mode & HCI_LM_MASTER) {
+
 		struct link_key *key;
 
 		key = hci_find_link_key_type(hcon->hdev, conn->dst,
@@ -768,6 +779,11 @@ int smp_conn_security(struct l2cap_conn *conn, __u8 sec_level)
 
 	if (hcon->link_mode & HCI_LM_MASTER) {
 		struct smp_cmd_pairing cp;
+
+		
+		
+
+
 
 		build_pairing_cmd(conn, &cp, NULL, authreq);
 		hcon->preq[0] = SMP_CMD_PAIRING_REQ;

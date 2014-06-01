@@ -10,6 +10,10 @@
  * GNU General Public License for more details.
  *
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 /*
  * SOC Info Routines
  *
@@ -607,8 +611,10 @@ arch_initcall(socinfo_init_sysdev);
 
 void *setup_dummy_socinfo(void)
 {
+
 	if (machine_is_msm8960_rumi3() || machine_is_msm8960_sim() ||
-	    machine_is_msm8960_cdp())
+	    machine_is_msm8960_cdp() || machine_is_msm8960_DVE073())
+
 		dummy_socinfo.id = 87;
 	else if (machine_is_apq8064_rumi3() || machine_is_apq8064_sim())
 		dummy_socinfo.id = 109;

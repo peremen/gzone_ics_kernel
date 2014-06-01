@@ -1,3 +1,7 @@
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 #ifndef __LINUX_NET_SCM_H
 #define __LINUX_NET_SCM_H
 
@@ -73,7 +77,7 @@ static __inline__ void scm_destroy(struct scm_cookie *scm)
 static __inline__ int scm_send(struct socket *sock, struct msghdr *msg,
 			       struct scm_cookie *scm)
 {
-	scm_set_cred(scm, task_tgid(current), current_cred());
+		scm_set_cred(scm, task_tgid(current), current_cred());
 	scm->fp = NULL;
 	unix_get_peersec_dgram(sock, scm);
 	if (msg->msg_controllen <= 0)

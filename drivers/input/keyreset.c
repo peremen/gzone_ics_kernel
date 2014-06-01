@@ -12,6 +12,11 @@
  * GNU General Public License for more details.
  *
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
+
 
 #include <linux/input.h>
 #include <linux/keyreset.h>
@@ -21,6 +26,11 @@
 #include <linux/sched.h>
 #include <linux/slab.h>
 #include <linux/syscalls.h>
+
+#include <linux/timer.h>
+
+
+
 
 
 struct keyreset_state {
@@ -42,9 +52,31 @@ static void deferred_restart(struct work_struct *dummy)
 	restart_requested = 2;
 	sys_sync();
 	restart_requested = 3;
-	kernel_restart(NULL);
+	
+	
+	kernel_restart("recovery");
+	
 }
 static DECLARE_WORK(restart_work, deferred_restart);
+
+
+
+static int keyreset_started;
+
+static void keyreset_timeout(unsigned long data)
+{
+	struct keyreset_state *state = (struct keyreset_state *)data;
+
+        pr_info("keyreset_timeout!\n");
+		state->restart_disabled = 1;
+		if (restart_requested)
+                panic("keyboard reset failed, %d", restart_requested);
+		pr_info("keyboard reset\n");
+		schedule_work(&restart_work);
+		restart_requested = 1;
+}
+static struct timer_list keyreset_timer = TIMER_INITIALIZER(keyreset_timeout, 0, 0);
+
 
 static void keyreset_event(struct input_handle *handle, unsigned int type,
 			   unsigned int code, int value)
@@ -52,14 +84,34 @@ static void keyreset_event(struct input_handle *handle, unsigned int type,
 	unsigned long flags;
 	struct keyreset_state *state = handle->private;
 
+		
+
 	if (type != EV_KEY)
 		return;
 
+	
+	
 	if (code >= KEY_MAX)
 		return;
+	
 
+
+
+
+
+
+	
 	if (!test_bit(code, state->keybit))
+	{
+
+		if (keyreset_started) {
+                        pr_info("keyreset end!\n");
+                        keyreset_started = 0;
+                        del_timer(&keyreset_timer);
+		}
+
 		return;
+	}
 
 	spin_lock_irqsave(&state->lock, flags);
 	if (!test_bit(code, state->key) == !value)
@@ -75,26 +127,57 @@ static void keyreset_event(struct input_handle *handle, unsigned int type,
 		if (value)
 			state->key_down++;
 		else
+	
+		{
+			if (keyreset_started) {
+				pr_info("keyreset end!\n");
+				keyreset_started = 0;
+				del_timer(&keyreset_timer);
+			}
+
 			state->key_down--;
+		}
+	
 	}
 	if (state->key_down == 0 && state->key_up == 0)
+	
+		{
+		if (keyreset_started) {
+			pr_info("keyreset end!\n");
+			keyreset_started = 0;
+			del_timer(&keyreset_timer);
+		}
 		state->restart_disabled = 0;
-
+		}
+	
 	pr_debug("reset key changed %d %d new state %d-%d-%d\n", code, value,
 		 state->key_down, state->key_up, state->restart_disabled);
-
+	
 	if (value && !state->restart_disabled &&
-	    state->key_down == state->key_down_target) {
-		state->restart_disabled = 1;
-		if (restart_requested)
-			panic("keyboard reset failed, %d", restart_requested);
-		if (state->reset_fn) {
-			restart_requested = state->reset_fn();
-		} else {
-			pr_info("keyboard reset\n");
-			schedule_work(&restart_work);
-			restart_requested = 1;
-		}
+	    state->key_down == state->key_down_target && !keyreset_started) {
+		pr_debug("keyreset start!\n");
+		keyreset_started = 1;
+		keyreset_timer.data = (unsigned long)state;
+		keyreset_timer.expires = jiffies + 5 * HZ;
+		add_timer(&keyreset_timer);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 	}
 done:
 	spin_unlock_irqrestore(&state->lock, flags);

@@ -10,6 +10,10 @@
  * GNU General Public License for more details.
  *
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #ifndef MDP4_H
 #define MDP4_H
@@ -334,6 +338,11 @@ struct mdp4_overlay_pipe {
 	struct mdp4_hsic_regs hsic_regs;
 	struct completion dmas_comp;
 	struct mdp_overlay req_data;
+
+
+	uint32 ext_flag;
+	struct msm_fb_data_type *mfd;
+
 };
 
 struct mdp4_statistic {

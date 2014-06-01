@@ -11,6 +11,10 @@
  * GNU General Public License for more details.
  *
  */
+/***********************************************************************/
+/* Modified by                                                         */
+/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+/***********************************************************************/
 
 #include <linux/module.h>
 #include <linux/kernel.h>
@@ -26,6 +30,9 @@
 #include <linux/clk.h>
 #include <linux/platform_device.h>
 
+#include <mach/board_DVE073.h>
+#include <mach/gpio.h>
+
 #include <asm/system.h>
 #include <asm/mach-types.h>
 
@@ -38,6 +45,9 @@
 #include "mipi_dsi.h"
 #include "mdp.h"
 #include "mdp4.h"
+
+#define PM8921_GPIO_BASE		NR_GPIO_IRQS
+#define PM8921_GPIO_PM_TO_SYS(pm_gpio)	(pm_gpio - 1 + PM8921_GPIO_BASE)
 
 static struct completion dsi_dma_comp;
 static struct completion dsi_mdp_comp;
@@ -1104,9 +1114,16 @@ int mipi_dsi_cmds_tx(struct msm_fb_data_type *mfd,
 {
 	struct dsi_cmd_desc *cm;
 	uint32 dsi_ctrl, ctrl;
-	int i, video_mode;
+	int i, video_mode,board_revision;
 	unsigned long flag;
+	static int gpio24;
 
+ 
+	board_revision = get_m7system_board_revision();	
+
+	
+	
+	
 	/* turn on cmd mode
 	* for video mode, do not send cmds more than
 	* one pixel line, since it only transmit it
@@ -1139,14 +1156,40 @@ int mipi_dsi_cmds_tx(struct msm_fb_data_type *mfd,
 
 	cm = cmds;
 	mipi_dsi_buf_init(tp);
-	for (i = 0; i < cnt; i++) {
-		mipi_dsi_buf_init(tp);
-		mipi_dsi_cmd_dma_add(tp, cm);
-		mipi_dsi_cmd_dma_tx(tp);
-		if (cm->wait)
+	
+	
+ 
+	if(0)
+	{
+		for (i = 0; i < cnt; i++) 
+		{
+			mipi_dsi_buf_init(tp);
+			mipi_dsi_cmd_dma_add(tp, cm);
+			mipi_dsi_cmd_dma_tx(tp);
+			if (cm->wait)
 			msleep(cm->wait);
-		cm++;
+			cm++;
+		}
 	}
+	else
+ 	{
+		gpio24 = PM8921_GPIO_PM_TO_SYS(24);
+
+		if(gpio_get_value_cansleep(gpio24))
+		{
+			for (i = 0; i < cnt; i++) 
+			{
+				mipi_dsi_buf_init(tp);
+				mipi_dsi_cmd_dma_add(tp, cm);
+				mipi_dsi_cmd_dma_tx(tp);
+				if (cm->wait)
+				msleep(cm->wait);
+				cm++;
+			}
+		}
+	}
+ 
+	
 
 	spin_lock_irqsave(&dsi_mdp_lock, flag);
 	dsi_mdp_busy = FALSE;

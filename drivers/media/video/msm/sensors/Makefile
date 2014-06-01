@@ -1,3 +1,8 @@
+#/***********************************************************************/
+#/* Modified by                                                         */
+#/* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
+#/***********************************************************************/
+
 GCC_VERSION      := $(shell $(CONFIG_SHELL) $(PWD)/scripts/gcc-version.sh $(CROSS_COMPILE)gcc)
 EXTRA_CFLAGS += -Idrivers/media/video/msm
 EXTRA_CFLAGS += -Idrivers/media/video/msm/io
@@ -10,3 +15,6 @@ obj-$(CONFIG_MT9M114) += mt9m114_v4l2.o
 obj-$(CONFIG_S5K4E1) += s5k4e1_v4l2.o
 obj-$(CONFIG_MT9E013) += mt9e013_v4l2.o
 obj-$(CONFIG_WEBCAM_OV9726) += ov9726_v4l2.o
+obj-$(CONFIG_IMX111) += imx111.o
+obj-$(CONFIG_MT9M113) += mt9m113_v4l2.o
+obj-$(CONFIG_MT9D115_SUB) += mt9d115_sub_v4l2.o
