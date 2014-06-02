@@ -157,10 +157,6 @@ struct pm8921_bms_chip {
 	struct wake_lock	low_voltage_wake_lock;
 };
 
-
-
-
-
 static DEFINE_MUTEX(soc_invalidation_mutex);
 static int shutdown_soc_invalid;
 static struct pm8921_bms_chip *the_chip;
@@ -357,15 +353,12 @@ static int pm_bms_masked_write(struct pm8921_bms_chip *chip, u16 addr,
 static int usb_chg_plugged_in(struct pm8921_bms_chip *chip)
 {
 	int val = pm8921_is_usb_chg_plugged_in();
-
-	
-	
 	if (val == -EINVAL) {
 		if (pm8xxx_restart_reason(chip->dev->parent)== PM8XXX_RESTART_CHG)
 			val = 1;
 		else
 			val = 0;
-	} 
+	}
 
 	return val;
 }
@@ -1241,7 +1234,6 @@ static int adjust_uuc(struct pm8921_bms_chip *chip, int fcc_uah,
 		return new_uuc;
 	}
 
-	
 	if (new_pc_unusable > chip->prev_pc_unusable)
 		chip->prev_pc_unusable++;
 	else
@@ -1249,7 +1241,6 @@ static int adjust_uuc(struct pm8921_bms_chip *chip, int fcc_uah,
 
 	new_uuc = (fcc_uah * chip->prev_pc_unusable) / 100;
 
-	
 	new_unusable_mv = interpolate_ocv(chip, batt_temp_degc,
 						chip->prev_pc_unusable);
 	if (new_unusable_mv < chip->v_cutoff)
@@ -1274,7 +1265,6 @@ static void calculate_iavg_ua(struct pm8921_bms_chip *chip, int cc_uah,
 	unsigned long now_tm_sec = 0;
 	int rc = 0;
 
-	
 	*iavg_ua = chip->prev_iavg_ua;
 
 	rtc = rtc_class_open(CONFIG_RTC_HCTOSYS_DEVICE);
@@ -1307,7 +1297,6 @@ static void calculate_iavg_ua(struct pm8921_bms_chip *chip, int cc_uah,
 
 	*delta_time_s = (now_tm_sec - chip->tm_sec);
 
-	
 	if (*delta_time_s < 15) {
 		*iavg_ua = chip->prev_iavg_ua;
 		goto out;
@@ -1322,7 +1311,6 @@ static void calculate_iavg_ua(struct pm8921_bms_chip *chip, int cc_uah,
 				*delta_time_s, delta_cc_uah, (int)*iavg_ua);
 
 out:
-	
 	chip->prev_iavg_ua = *iavg_ua;
 
 	/* remember cc_uah */
@@ -1349,10 +1337,6 @@ static int calculate_unusable_charge_uah(struct pm8921_bms_chip *chip,
 	static int firsttime = 1;
 	int pc_unusable;
 
-	
-
-
-
 	if (firsttime && chip->shutdown_iavg_ua != 0) {
 		pr_emerg("Using shutdown_iavg_ua = %d in all samples\n",
 				chip->shutdown_iavg_ua);
@@ -1363,10 +1347,6 @@ static int calculate_unusable_charge_uah(struct pm8921_bms_chip *chip,
 		iavg_num_samples = IAVG_SAMPLES;
 	}
 
-	
-
-
-
 	if (iavg_ma < 0)
 		iavg_ma = CHARGING_IAVG_MA;
 	iavg_samples[iavg_index] = iavg_ma;
@@ -1375,7 +1355,6 @@ static int calculate_unusable_charge_uah(struct pm8921_bms_chip *chip,
 	if (iavg_num_samples >= IAVG_SAMPLES)
 		iavg_num_samples = IAVG_SAMPLES;
 
-	
 	iavg_ma = 0;
 	if (iavg_num_samples != 0) {
 		for (i = 0; i < iavg_num_samples; i++) {
@@ -1392,11 +1371,9 @@ static int calculate_unusable_charge_uah(struct pm8921_bms_chip *chip,
 					&pc_unusable);
 	pr_debug("iavg = %d uuc_iavg = %d\n", iavg_ma, uuc_uah_iavg);
 
-	
 	uuc_uah_iavg = adjust_uuc(chip, fcc_uah, pc_unusable, uuc_uah_iavg,
 					batt_temp, rbatt, &iavg_ma);
 
-	
 	chip->prev_uuc_iavg_ma = iavg_ma;
 
 	firsttime = 0;
@@ -1540,7 +1517,6 @@ static void find_ocv_for_soc(struct pm8921_bms_chip *chip,
 	int delta_mv = 5;
 	int prev_delta_pc = 0;
 
-
 	int cnt = 0;
 	int ocv_renew_cnt = 0;
 
@@ -1552,7 +1528,6 @@ static void find_ocv_for_soc(struct pm8921_bms_chip *chip,
 
 	ocv = interpolate_ocv(chip, batt_temp_degc, pc);
 
-	
 	pr_debug("batt_temp=%d, chargecycles=%d, fcc_uah=%d, "
 		"uuc_uah=%d, cc_uah=%d, shutdown_soc=%d\n",
 		batt_temp,
@@ -1561,7 +1536,6 @@ static void find_ocv_for_soc(struct pm8921_bms_chip *chip,
 		uuc_uah,
 		cc_uah,
 		shutdown_soc);
-	
 
 	pr_debug("s_soc = %d, fcc = %d uuc = %d rc = %d, pc = %d, ocv mv = %d\n",
 		shutdown_soc, fcc_uah, uuc_uah, (int)rc, pc, ocv);
@@ -1570,16 +1544,6 @@ static void find_ocv_for_soc(struct pm8921_bms_chip *chip,
 
 
 	while (abs(new_pc - pc) > 1) {
- 
-
-
-
-
-
-
-
-
-
 		if (new_pc > pc) {
 			delta_mv = -1 * abs(delta_mv);
 		} else {
@@ -1607,12 +1571,9 @@ static void find_ocv_for_soc(struct pm8921_bms_chip *chip,
 					new_pc, ocv, delta_mv);
 		}
 
-		
 		pr_debug("new_pc=%d, pc=%d, ocv=%d, new_ocv=%d, delta_mv=%d, prev_delta_pc=%d\n",
 			new_pc, pc, ocv, new_ocv, delta_mv, prev_delta_pc);
-		
 
-		
 		cnt++;
 
 		if (cnt >= 1000) {
@@ -1620,7 +1581,6 @@ static void find_ocv_for_soc(struct pm8921_bms_chip *chip,
 					new_pc, pc, ocv, delta_mv, ocv_renew_cnt);
 			break;
 		}
-		
 
 	}
 
@@ -1655,7 +1615,7 @@ static void adjust_rc_and_uuc_for_specific_soc(
 	*ret_rbatt = rbatt;
 	*ret_rc = rc_uah;
 	*ret_uuc = uuc_uah;
-} 
+}
 
 static int bound_soc(int soc)
 {
@@ -1672,11 +1632,9 @@ static int charging_adjustments(struct pm8921_bms_chip *chip,
 	int chg_soc;
 
 	if (chip->soc_at_cv == -EINVAL) {
-		
 		if (vbat_uv <= chip->max_voltage_uv)
 			pr_debug("CC CHG SOC %d\n", soc);
 
-		
 		if (vbat_uv >= chip->max_voltage_uv) {
 			chip->soc_at_cv = soc;
 			chip->prev_chg_soc = soc;
@@ -1687,15 +1645,6 @@ static int charging_adjustments(struct pm8921_bms_chip *chip,
 		return soc;
 	}
 
-	
-
-
-
-
-	
-
-
-
 	if (vbat_uv <= chip->max_voltage_uv) {
 		pr_debug("vbat %d < max = %d CC CHG SOC %d\n",
 			vbat_uv, chip->max_voltage_uv, chip->prev_chg_soc);
@@ -1705,17 +1654,12 @@ static int charging_adjustments(struct pm8921_bms_chip *chip,
 	chg_soc = linear_interpolate(chip->soc_at_cv, chip->ibat_at_cv_ua,
 		100, -100000,
 		ibat_ua);
-
-	
 	pr_debug("chg_soc=%d, soc_at_cv=%d, ibat_at_cv_ua=%d, ibat_ua=%d\n",
 		chg_soc, chip->soc_at_cv, chip->ibat_at_cv_ua, ibat_ua);
-	
 
-	
 	if (chg_soc > chip->prev_chg_soc){
 		int new_ocv_uv;
 		int new_rc;
-		
 		chip->prev_chg_soc = chg_soc;
 
 		find_ocv_for_soc(chip, batt_temp, chargecycles,
@@ -1735,10 +1679,6 @@ static int charging_adjustments(struct pm8921_bms_chip *chip,
 static void very_low_voltage_check(struct pm8921_bms_chip *chip,
 					int ibat_ua, int vbat_uv)
 {
-	
-
-
-
 	if (vbat_uv <= (chip->v_cutoff + 20) * 1000
 			&& !chip->low_voltage_wake_lock_held) {
 		pr_debug("voltage = %d low holding wakelock\n", vbat_uv);
@@ -1832,7 +1772,6 @@ static int adjust_soc(struct pm8921_bms_chip *chip, int soc,
 						chip->last_ocv_uv - (m * 1000),
 						batt_temp, last_chargecycles);
 
-			
 			cnt++;
 
 			if (cnt >= 150) {
@@ -1840,7 +1779,6 @@ static int adjust_soc(struct pm8921_bms_chip *chip, int soc,
 						pc_new, pc, m);
 				break;
 			}
-			
 		}
 	} else {
 		/*
@@ -1915,14 +1853,11 @@ static void backup_soc_and_iavg(struct pm8921_bms_chip *chip, int batt_temp,
 
 	pm_bms_masked_write(chip, TEMP_IAVG_STORAGE,
 			TEMP_IAVG_STORAGE_USE_MASK, temp);
-
-	
 	if (soc == 0)
 		temp = SOC_ZERO;
 	else
 		temp = soc;
 
-	
 	if (batt_temp > IGNORE_SOC_TEMP_DECIDEG)
 		pm8xxx_writeb(the_chip->dev->parent, TEMP_SOC_STORAGE, temp);
 }
@@ -1986,25 +1921,12 @@ static int scale_soc_while_chg(struct pm8921_bms_chip *chip,
 	int scaled_soc;
 	int numerator;
 
-	
-
-
-
-
-
-
-
-	
 	if (the_chip->start_percent == -EINVAL)
 		return prev_soc;
 
 	chg_time_sec = DIV_ROUND_UP(the_chip->charge_time_us, USEC_PER_SEC);
 	catch_up_sec = DIV_ROUND_UP(the_chip->catch_up_time_us, USEC_PER_SEC);
 	pr_debug("cts= %d catch_up_sec = %d\n", chg_time_sec, catch_up_sec);
-
-	
-
-
 
 	if (chg_time_sec > catch_up_sec)
 		return new_soc;
@@ -2084,10 +2006,6 @@ static int calculate_state_of_charge(struct pm8921_bms_chip *chip,
 	}
 
 	if (firsttime && soc < 0) {
-		
-
-
-
 		pr_debug("soc is %d, adjusting pon ocv to make it 0\n", soc);
 		adjust_rc_and_uuc_for_specific_soc(
 						chip,
@@ -2245,20 +2163,11 @@ static int report_state_of_charge(struct pm8921_bms_chip *chip)
 		= (now.tv_sec - chip->t_soc_queried.tv_sec) * USEC_PER_SEC
 			+ (now.tv_nsec - chip->t_soc_queried.tv_nsec) / 1000;
 	} else {
-		
 		delta_time_us = 0;
 	}
 
-	
-
-
-
 	if (the_chip->start_percent != -EINVAL) {
 		if (the_chip->charge_time_us == 0) {
-			
-
-
-
 			if (abs(soc - last_soc) < MAX_CATCHUP_SOC)
 				the_chip->catch_up_time_us =
 				(soc - last_soc) * SOC_CATCHUP_SEC_PER_PERCENT
@@ -2271,17 +2180,13 @@ static int report_state_of_charge(struct pm8921_bms_chip *chip)
 				the_chip->catch_up_time_us = 0;
 		}
 
-		
 		if (the_chip->charge_time_us
 				< SOC_CATCHUP_SEC_MAX * USEC_PER_SEC)
 			chip->charge_time_us += delta_time_us;
-
-		
 		if (last_soc == soc)
 			the_chip->catch_up_time_us = 0;
 	}
 
-	
 	if (last_soc != -EINVAL && last_soc < soc && soc != 100)
 		soc = scale_soc_while_chg(chip, delta_time_us, soc, last_soc);
 	if(soc > 100)
@@ -2312,7 +2217,6 @@ void pm8921_bms_invalidate_shutdown_soc(void)
 	shutdown_soc_invalid = 1;
 	last_soc = -EINVAL;
 	if (the_chip) {
-		
 		if (the_chip->pon_ocv_uv) {
 			the_chip->last_ocv_uv = the_chip->pon_ocv_uv;
 			calculate_soc = 1;
@@ -2887,7 +2791,7 @@ static int64_t read_battery_id(struct pm8921_bms_chip *chip)
 	return result.physical;
 }
 
-#define C811_STD_ID_MIN 412 
+#define C811_STD_ID_MIN 412
 #define C811_STD_ID_MAX 479
 #define C811_EXT_ID_MIN 682
 #define C811_EXT_ID_MAX 769
@@ -2895,11 +2799,6 @@ static int64_t read_battery_id(struct pm8921_bms_chip *chip)
 static int set_battery_data(struct pm8921_bms_chip *chip)
 {
 	int64_t battery_id;
-
-
-
-
-
 
 	battery_id = div_u64(read_battery_id(chip),1000);
 	if (battery_id < 0) {
@@ -2918,24 +2817,24 @@ static int set_battery_data(struct pm8921_bms_chip *chip)
 	}
 
 c811_std:
-		chip->fcc = c811_1800_data.fcc;
-		chip->fcc_temp_lut = c811_1800_data.fcc_temp_lut;
-		chip->fcc_sf_lut = c811_1800_data.fcc_sf_lut;
-		chip->pc_temp_ocv_lut = c811_1800_data.pc_temp_ocv_lut;
-		chip->pc_sf_lut = c811_1800_data.pc_sf_lut;
-		chip->rbatt_sf_lut = c811_1800_data.rbatt_sf_lut;
-		chip->default_rbatt_mohm = c811_1800_data.default_rbatt_mohm;
-		chip->delta_rbatt_mohm = c811_1800_data.delta_rbatt_mohm;
-		return 0;
+	chip->fcc = c811_1800_data.fcc;
+	chip->fcc_temp_lut = c811_1800_data.fcc_temp_lut;
+	chip->fcc_sf_lut = c811_1800_data.fcc_sf_lut;
+	chip->pc_temp_ocv_lut = c811_1800_data.pc_temp_ocv_lut;
+	chip->pc_sf_lut = c811_1800_data.pc_sf_lut;
+	chip->rbatt_sf_lut = c811_1800_data.rbatt_sf_lut;
+	chip->default_rbatt_mohm = c811_1800_data.default_rbatt_mohm;
+	chip->delta_rbatt_mohm = c811_1800_data.delta_rbatt_mohm;
+	return 0;
 c811_ext:
-		chip->fcc = c811_2920_data.fcc;
-		chip->fcc_temp_lut = c811_2920_data.fcc_temp_lut;
-		chip->pc_temp_ocv_lut = c811_2920_data.pc_temp_ocv_lut;
-		chip->pc_sf_lut = c811_2920_data.pc_sf_lut;
-		chip->rbatt_sf_lut = c811_2920_data.rbatt_sf_lut;
-		chip->default_rbatt_mohm = c811_2920_data.default_rbatt_mohm;
-		chip->delta_rbatt_mohm = c811_2920_data.delta_rbatt_mohm;
-		return 0;
+	chip->fcc = c811_2920_data.fcc;
+	chip->fcc_temp_lut = c811_2920_data.fcc_temp_lut;
+	chip->pc_temp_ocv_lut = c811_2920_data.pc_temp_ocv_lut;
+	chip->pc_sf_lut = c811_2920_data.pc_sf_lut;
+	chip->rbatt_sf_lut = c811_2920_data.rbatt_sf_lut;
+	chip->default_rbatt_mohm = c811_2920_data.default_rbatt_mohm;
+	chip->delta_rbatt_mohm = c811_2920_data.delta_rbatt_mohm;
+	return 0;
 }
 
 enum bms_request_operation {
@@ -3339,11 +3238,8 @@ static int __devinit pm8921_bms_probe(struct platform_device *pdev)
 		goto free_chip;
 	}
 
-	
 	if (chip->default_rbatt_mohm <= 0)
 		chip->default_rbatt_mohm = DEFAULT_RBATT_MOHMS;
-
-
 
 	platform_set_drvdata(pdev, chip);
 	the_chip = chip;
@@ -3356,7 +3252,6 @@ static int __devinit pm8921_bms_probe(struct platform_device *pdev)
 	}
 	check_initial_ocv(chip);
 
-	
 	schedule_delayed_work(&chip->calib_hkadc_delayed_work, 0);
 
 	/* enable the vbatt reading interrupts for scheduling hkadc calib */

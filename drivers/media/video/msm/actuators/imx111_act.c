@@ -24,10 +24,10 @@ DEFINE_MUTEX(imx111_act_mutex);
 static struct msm_actuator_ctrl_t imx111_act_t;
 
 static int32_t imx111_wrapper_i2c_write(struct msm_actuator_ctrl_t *a_ctrl,
-	int16_t next_lens_position, void *params)
+		int16_t next_lens_position, void *params)
 {
 
-    int32_t rc = 0;
+	int32_t rc = 0;
 
 
 	uint16_t msb = 0, lsb = 0;
@@ -37,31 +37,24 @@ static int32_t imx111_wrapper_i2c_write(struct msm_actuator_ctrl_t *a_ctrl,
 	lsb |= ((*hw_params) & 0xF);
 	CDBG("%s: Actuator MSB:0x%x, LSB:0x%x\n", __func__, msb, lsb);
 
-
 	rc = msm_camera_i2c_write(&a_ctrl->i2c_client,
-		msb, lsb, MSM_CAMERA_I2C_BYTE_DATA);
+			msb, lsb, MSM_CAMERA_I2C_BYTE_DATA);
 
-    if(rc < 0){
+	if (rc < 0){
 		pr_err("%s: X  I2C write failed \n", __func__);
-        return rc;
-    }
-
-
-
-
+		return rc;
+	}
 
 	return next_lens_position;
 }
 
 static uint16_t imx111_macro_scenario[] = {
-	
 	4,
 	10,
 	IMX111_TOTAL_STEPS_NEAR_TO_FAR_MAX,
 };
 
 static uint16_t imx111_inf_scenario[] = {
-	
 	1,
 	16,
 	IMX111_TOTAL_STEPS_NEAR_TO_FAR_MAX,
@@ -78,15 +71,10 @@ static uint16_t imx111_hw_params[] = {
 };
 
 static struct region_params_t imx111_regions[] = {
-	
-
-
-	
 	{
 		.step_bound = {1, 0},
 		.code_per_step = 130,
 	},
-	
 	{
 		.step_bound = {IMX111_TOTAL_STEPS_NEAR_TO_FAR_MAX, 1},
 		.code_per_step = 8,
@@ -94,20 +82,16 @@ static struct region_params_t imx111_regions[] = {
 };
 
 static struct damping_params_t imx111_macro_reg1_damping[] = {
-	
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 1000,
 		.hw_params = &imx111_hw_params[0],
 	},
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 1000,
 		.hw_params = &imx111_hw_params[0],
 	},
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 1000,
@@ -116,20 +100,16 @@ static struct damping_params_t imx111_macro_reg1_damping[] = {
 };
 
 static struct damping_params_t imx111_macro_reg2_damping[] = {
-	
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 5000,
 		.hw_params = &imx111_hw_params[1],
 	},
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 5000,
 		.hw_params = &imx111_hw_params[2],
 	},
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 5000,
@@ -138,20 +118,16 @@ static struct damping_params_t imx111_macro_reg2_damping[] = {
 };
 
 static struct damping_params_t imx111_inf_reg1_damping[] = {
-	
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 1000,
 		.hw_params = &imx111_hw_params[0],
 	},
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 1000,
 		.hw_params = &imx111_hw_params[0],
 	},
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 1000,
@@ -160,20 +136,16 @@ static struct damping_params_t imx111_inf_reg1_damping[] = {
 };
 
 static struct damping_params_t imx111_inf_reg2_damping[] = {
-	
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 5000,
 		.hw_params = &imx111_hw_params[4],
 	},
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 20000,
 		.hw_params = &imx111_hw_params[5],
 	},
-	
 	{
 		.damping_step = 0x3FF,
 		.damping_delay = 25000,
@@ -182,24 +154,18 @@ static struct damping_params_t imx111_inf_reg2_damping[] = {
 };
 
 static struct damping_t imx111_macro_regions[] = {
-	
-	
 	{
 		.ringing_params = imx111_macro_reg1_damping,
 	},
-	
 	{
 		.ringing_params = imx111_macro_reg2_damping,
 	},
 };
 
 static struct damping_t imx111_inf_regions[] = {
-	
-	
 	{
 		.ringing_params = imx111_inf_reg1_damping,
 	},
-	
 	{
 		.ringing_params = imx111_inf_reg2_damping,
 	},
@@ -208,27 +174,27 @@ static struct damping_t imx111_inf_regions[] = {
 
 static int32_t imx111_set_params(struct msm_actuator_ctrl_t *a_ctrl)
 {
-    int32_t rc = 0;
+	int32_t rc = 0;
 
 	rc = msm_camera_i2c_write(&a_ctrl->i2c_client,0xEC, 0xA3,
-		MSM_CAMERA_I2C_BYTE_DATA);
-    if(rc < 0)
-        return rc;
+			MSM_CAMERA_I2C_BYTE_DATA);
+	if(rc < 0)
+		return rc;
 
 	rc = msm_camera_i2c_write(&a_ctrl->i2c_client,0xA1, 0x00,
-		MSM_CAMERA_I2C_BYTE_DATA);
-    if(rc < 0)
-        return rc;
+			MSM_CAMERA_I2C_BYTE_DATA);
+	if(rc < 0)
+		return rc;
 
 	rc = msm_camera_i2c_write(&a_ctrl->i2c_client,0xF2, 0x90,
-		MSM_CAMERA_I2C_BYTE_DATA);
-    if(rc < 0)
-        return rc;
+			MSM_CAMERA_I2C_BYTE_DATA);
+	if(rc < 0)
+		return rc;
 
 	rc = msm_camera_i2c_write(&a_ctrl->i2c_client,0xDC, 0x51,
-		MSM_CAMERA_I2C_BYTE_DATA);
-    if(rc < 0)
-        return rc;
+			MSM_CAMERA_I2C_BYTE_DATA);
+	if(rc < 0)
+		return rc;
 
 	return rc;
 }
@@ -239,14 +205,14 @@ static const struct i2c_device_id imx111_act_i2c_id[] = {
 };
 
 static int imx111_act_config(
-	void __user *argp)
+		void __user *argp)
 {
 	CDBG("%s called\n", __func__);
 	return (int) msm_actuator_config(&imx111_act_t, argp);
 }
 
 static int imx111_i2c_add_driver_table(
-	void)
+		void)
 {
 	CDBG("%s called\n", __func__);
 	return (int) msm_actuator_init_table(&imx111_act_t);
@@ -262,7 +228,7 @@ static struct i2c_driver imx111_act_i2c_driver = {
 };
 
 static int __init imx111_i2c_add_driver(
-	void)
+		void)
 {
 	CDBG("%s called\n", __func__);
 	return i2c_add_driver(imx111_act_t.i2c_driver);
@@ -275,7 +241,7 @@ static struct v4l2_subdev_ops imx111_act_subdev_ops = {
 };
 
 int32_t imx111_actuator_init_table(
-	struct msm_actuator_ctrl_t *a_ctrl)
+		struct msm_actuator_ctrl_t *a_ctrl)
 {
 	int32_t rc = 0;
 	int16_t step_index = 0;
@@ -288,16 +254,16 @@ int32_t imx111_actuator_init_table(
 	if (a_ctrl->func_tbl.actuator_set_params)
 	{
 		rc = a_ctrl->func_tbl.actuator_set_params(a_ctrl);
-        if(rc < 0)
-            return rc;
-    }
-	
+		if(rc < 0)
+			return rc;
+	}
+
 	a_ctrl->step_position_table =
 		kmalloc(sizeof(uint16_t) * (IMX111_TOTAL_STEPS_NEAR_TO_FAR_MAX + 1),
-		GFP_KERNEL);
+				GFP_KERNEL);
 	a_ctrl->step_position_table[0] = a_ctrl->initial_code;
 
-	
+
 	af_calib = a_ctrl->eeprom_client->data_tbl[1].data;
 	dac_inf = af_calib[0] << 8 | af_calib[1];
 	dac_1m = af_calib[2] << 8 | af_calib[3];
@@ -327,11 +293,11 @@ int32_t imx111_actuator_init_table(
 	}
 
 	for (step_index = 0;
-		step_index < a_ctrl->set_info.total_steps;
-		step_index++) {
+			step_index < a_ctrl->set_info.total_steps;
+			step_index++) {
 		CDBG("step_position_table[%d]= %d\n",
-			step_index,
-			a_ctrl->step_position_table[step_index]);
+				step_index,
+				a_ctrl->step_position_table[step_index]);
 	}
 
 	a_ctrl->curr_step_pos = 0;
@@ -346,8 +312,8 @@ static int imx111_act_power_down(void *act_info)
 }
 
 static int32_t imx111_act_probe(
-	void *board_info,
-	void *sdev)
+		void *board_info,
+		void *sdev)
 {
 	struct msm_actuator_info *info;
 	info = (struct msm_actuator_info *)board_info;
@@ -355,8 +321,8 @@ static int32_t imx111_act_probe(
 		(struct msm_camera_eeprom_client *)info->eeprom_client;
 
 	return (int) msm_actuator_create_subdevice(&imx111_act_t,
-		info->board_info,
-		(struct v4l2_subdev *)sdev);
+			info->board_info,
+			(struct v4l2_subdev *)sdev);
 }
 
 static struct msm_actuator_ctrl_t imx111_act_t = {
@@ -398,17 +364,17 @@ static struct msm_actuator_ctrl_t imx111_act_t = {
 		.ver_view_angle_den = 10,
 	},
 
-	
+
 	.ringing_scenario[MOVE_NEAR] = imx111_macro_scenario,
 	.scenario_size[MOVE_NEAR] = ARRAY_SIZE(imx111_macro_scenario),
 	.ringing_scenario[MOVE_FAR] = imx111_inf_scenario,
 	.scenario_size[MOVE_FAR] = ARRAY_SIZE(imx111_inf_scenario),
 
-	
+
 	.region_params = imx111_regions,
 	.region_size = ARRAY_SIZE(imx111_regions),
 
-	
+
 	.damping[MOVE_NEAR] = imx111_macro_regions,
 	.damping[MOVE_FAR] = imx111_inf_regions,
 

@@ -60,17 +60,10 @@ int32_t msm_camera_eeprom_read(struct msm_camera_eeprom_client *ectrl,
 		int i;
 		rc = msm_camera_i2c_read_seq(
 			ectrl->i2c_client, reg_addr, buf, num_byte);
-
-
 		for (i = 0; i < num_byte; i += 2) {
 			data_ptr[i] = buf[i+1];
 			data_ptr[i+1] = buf[i];
 		}
-
-
-
-
-
 	}
 	return rc;
 }
@@ -105,16 +98,8 @@ int32_t msm_camera_eeprom_get_data(struct msm_camera_eeprom_client *ectrl,
 		return -EFAULT;
 	if (copy_to_user(edata->eeprom_data,
 		ectrl->data_tbl[edata->index].data,
-
-
-		ectrl->data_tbl[edata->index].size)) {
+		ectrl->data_tbl[edata->index].size))
 		rc = -EFAULT;
-		}
-
-
-
-
-
 	return rc;
 }
 

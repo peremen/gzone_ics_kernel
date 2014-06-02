@@ -80,11 +80,7 @@ extern struct sx150x_platform_data msm8960_sx150x_data[];
 extern struct msm_camera_board_info msm8960_camera_board_info;
 extern unsigned char hdmi_is_primary;
 
-
 extern struct msm_camera_board_info msm8960_camera_board_info_sub;
-
-
-
 
 int get_m7system_board_revision(void);
 void msm8960_init_cam(void);

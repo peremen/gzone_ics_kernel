@@ -19,69 +19,45 @@
 #include "msm.h"
 #include "msm_ispif.h"
 #include <mach/irqs.h>
-#include <linux/regulator/consumer.h> 
-#include <linux/mfd/pm8xxx/pm8921.h>  
+#include <linux/regulator/consumer.h>
+#include <linux/mfd/pm8xxx/pm8921.h>
 
 #define SENSOR_NAME "imx111"
 #define PLATFORM_DRIVER_NAME "msm_camera_imx111"
 #define imx111_obj imx111_##obj
 
+#define IMX111_WAIT_PWON_EN2           1
+#define IMX111_WAIT_PWON_EN1           1
+#define IMX111_WAIT_PWON_VREG_L11      1
+#define IMX111_WAIT_PWON_RST_H         1
+#define IMX111_WAIT_PWON_REG_SET       1
+#define IMX111_WAIT_PWON_CLK           1
+#define IMX111_WAIT_PWON_CLK_2        10
 
+#define IMX111_WAIT_PWOFF_MCLK        35
+#define IMX111_WAIT_PWOFF_RST_L        1
+#define IMX111_WAIT_PWOFF_VREG_L11     1
+#define IMX111_WAIT_PWOFF_V_EN1        1
+#define IMX111_WAIT_PWOFF_V_EN2        1
+#define IMX111_WAIT_PWOFF_V_EN3        1
+#define IMX111_WAIT_PWOFF_VREG_L12     1
 
-
-
-
-
-
-#define IMX111_WAIT_PWON_EN2           1       
-#define IMX111_WAIT_PWON_EN1           1       
-#define IMX111_WAIT_PWON_VREG_L11      1       
-#define IMX111_WAIT_PWON_RST_H         1       
-#define IMX111_WAIT_PWON_REG_SET       1       
-#define IMX111_WAIT_PWON_CLK           1       
-#define IMX111_WAIT_PWON_CLK_2        10       
-
-
-
-#define IMX111_WAIT_PWOFF_MCLK        35       
-#define IMX111_WAIT_PWOFF_RST_L        1       
-#define IMX111_WAIT_PWOFF_VREG_L11     1       
-#define IMX111_WAIT_PWOFF_V_EN1        1       
-#define IMX111_WAIT_PWOFF_V_EN2        1       
-#define IMX111_WAIT_PWOFF_V_EN3        1       
-#define IMX111_WAIT_PWOFF_VREG_L12     1       
-
-
-#define IMX111_GPIO_CAM_V_EN3         2        
-#define IMX111_GPIO_CAM_V_EN1         3        
-#define IMX111_GPIO_CAM_MCLK0         5        
-#define IMX111_GPIO_CAM_I2C_SDA       20       
-#define IMX111_GPIO_CAM_I2C_SCL       21       
-#define IMX111_GPIO_CAM_RST_N        107       
-
+#define IMX111_GPIO_CAM_V_EN3         2
+#define IMX111_GPIO_CAM_V_EN1         3
+#define IMX111_GPIO_CAM_MCLK0         5
+#define IMX111_GPIO_CAM_I2C_SDA       20
+#define IMX111_GPIO_CAM_I2C_SCL       21
+#define IMX111_GPIO_CAM_RST_N        107
 
 #define PM8921_GPIO_BASE        NR_GPIO_IRQS
 #define PM8921_GPIO_PM_TO_SYS(pm_gpio)  (pm_gpio - 1 + PM8921_GPIO_BASE)
-#define IMX111_PMGPIO_CAM_V_EN2  PM8921_GPIO_PM_TO_SYS(25)   
-
-
-
-
-
-
-
+#define IMX111_PMGPIO_CAM_V_EN2  PM8921_GPIO_PM_TO_SYS(25)
 
 #define CAM_VANA_MINUV                    2600000
 #define CAM_VANA_MAXUV                    3300000
 #define CAM_VANA_LOAD_UA                  150000
 
 static struct regulator *cam_vana = NULL;
-
-
-
-
-
-
 
 #define CAM_VDIG_MINUV                    1100000
 #define CAM_VDIG_MAXUV                    1500000
@@ -90,32 +66,32 @@ static struct regulator *cam_vana = NULL;
 static struct regulator *cam_vdig = NULL;
 
 struct pm_gpio imx111_cam_v_en2_on = {
-    .direction      = PM_GPIO_DIR_OUT,
-    .output_buffer  = PM_GPIO_OUT_BUF_CMOS,
-    .output_value   = 1,
-    .pull           = PM_GPIO_PULL_NO,
-    .vin_sel        = PM_GPIO_VIN_S4,
-    .out_strength   = PM_GPIO_STRENGTH_LOW,
-    .function       = PM_GPIO_FUNC_NORMAL,
-    .inv_int_pol    = 0,
-    .disable_pin    = 0,
+	.direction      = PM_GPIO_DIR_OUT,
+	.output_buffer  = PM_GPIO_OUT_BUF_CMOS,
+	.output_value   = 1,
+	.pull           = PM_GPIO_PULL_NO,
+	.vin_sel        = PM_GPIO_VIN_S4,
+	.out_strength   = PM_GPIO_STRENGTH_LOW,
+	.function       = PM_GPIO_FUNC_NORMAL,
+	.inv_int_pol    = 0,
+	.disable_pin    = 0,
 };
 
 struct pm_gpio imx111_cam_v_en2_off = {
-    .direction      = PM_GPIO_DIR_OUT,
-    .output_buffer  = PM_GPIO_OUT_BUF_CMOS,
-    .output_value   = 0,
-    .pull           = PM_GPIO_PULL_NO,
-    .vin_sel        = PM_GPIO_VIN_S4,
-    .out_strength   = PM_GPIO_STRENGTH_LOW,
-    .function       = PM_GPIO_FUNC_NORMAL,
-    .inv_int_pol    = 0,
-    .disable_pin    = 0,
+	.direction      = PM_GPIO_DIR_OUT,
+	.output_buffer  = PM_GPIO_OUT_BUF_CMOS,
+	.output_value   = 0,
+	.pull           = PM_GPIO_PULL_NO,
+	.vin_sel        = PM_GPIO_VIN_S4,
+	.out_strength   = PM_GPIO_STRENGTH_LOW,
+	.function       = PM_GPIO_FUNC_NORMAL,
+	.inv_int_pol    = 0,
+	.disable_pin    = 0,
 };
 
 
 static struct msm_cam_clk_info imx111_cam_clk_info[] = {
-    {"cam_clk", MSM_SENSOR_MCLK_25HZ},
+	{"cam_clk", MSM_SENSOR_MCLK_25HZ},
 };
 
 
@@ -138,148 +114,6 @@ static struct msm_camera_i2c_reg_conf imx111_groupon_settings[] = {
 static struct msm_camera_i2c_reg_conf imx111_groupoff_settings[] = {
 	{0x104, 0x00},
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 static struct msm_camera_i2c_reg_conf imx111_snap_settings[] = {
 
@@ -618,30 +452,6 @@ static struct msm_camera_i2c_reg_conf imx111_full_hd_video_settings[] = {
 
 
 static struct msm_camera_i2c_reg_conf imx111_recommend_settings[] = {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	{0x0101, 0x03},
 	{0x3080, 0x50},
 	{0x3087, 0x53},
@@ -664,61 +474,6 @@ static struct msm_camera_i2c_reg_conf imx111_recommend_settings[] = {
 	{0x3032, 0x40},
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 static struct msm_camera_i2c_reg_conf imx111_comm1_settings[] = {
 	{0x3035, 0x10},
@@ -746,92 +501,58 @@ static struct msm_camera_i2c_reg_conf imx111_comm2_part2_settings[] = {
 
 static struct msm_camera_i2c_conf_array imx111_comm_confs[] = {
 	{&imx111_comm1_settings[0],
-	ARRAY_SIZE(imx111_comm1_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
+		ARRAY_SIZE(imx111_comm1_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
 	{&imx111_comm2_part1_settings[0],
-	ARRAY_SIZE(imx111_comm2_part1_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
+		ARRAY_SIZE(imx111_comm2_part1_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
 	{&imx111_comm2_part2_settings[0],
-	ARRAY_SIZE(imx111_comm2_part2_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
+		ARRAY_SIZE(imx111_comm2_part2_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
 };
-
 
 static struct v4l2_subdev_info imx111_subdev_info[] = {
 	{
-	.code   = V4L2_MBUS_FMT_SBGGR10_1X10,
-	.colorspace = V4L2_COLORSPACE_JPEG,
-	.fmt    = 1,
-	.order    = 0,
+		.code   = V4L2_MBUS_FMT_SBGGR10_1X10,
+		.colorspace = V4L2_COLORSPACE_JPEG,
+		.fmt    = 1,
+		.order    = 0,
 	},
-	
 };
 
 static struct msm_camera_i2c_conf_array imx111_init_conf[] = {
 	{&imx111_recommend_settings[0],
-	ARRAY_SIZE(imx111_recommend_settings), 0, MSM_CAMERA_I2C_BYTE_DATA}
+		ARRAY_SIZE(imx111_recommend_settings), 0, MSM_CAMERA_I2C_BYTE_DATA}
 };
 
 static struct msm_camera_i2c_conf_array imx111_confs[] = {
-
-
-
-
-
-
 	{&imx111_snap_settings[0],
-	ARRAY_SIZE(imx111_snap_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
+		ARRAY_SIZE(imx111_snap_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
 	{&imx111_prev_settings[0],
-	ARRAY_SIZE(imx111_prev_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
+		ARRAY_SIZE(imx111_prev_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
 	{&imx111_hd_video_settings[0],
-	ARRAY_SIZE(imx111_hd_video_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
+		ARRAY_SIZE(imx111_hd_video_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
 	{&imx111_hs_prev_snap_settings[0],
-	ARRAY_SIZE(imx111_hs_prev_snap_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
+		ARRAY_SIZE(imx111_hs_prev_snap_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
 	{&imx111_full_hd_video_settings[0],
-	ARRAY_SIZE(imx111_full_hd_video_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
+		ARRAY_SIZE(imx111_full_hd_video_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
 	{&imx111_snap_settings[0],
-	ARRAY_SIZE(imx111_snap_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
+		ARRAY_SIZE(imx111_snap_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
 
 	{&imx111_hs_prev_snap_settings[0],
-	ARRAY_SIZE(imx111_hs_prev_snap_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
-
-
+		ARRAY_SIZE(imx111_hs_prev_snap_settings), 0, MSM_CAMERA_I2C_BYTE_DATA},
 };
 
 static struct msm_sensor_output_info_t imx111_dimensions[] = {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	{
-	
+
 		.x_output = 0x0CD0,             
-		.y_output = 0x09A0,             
-		.line_length_pclk   = 0x0D70,   
-		.frame_length_lines = 0x09E0,   
-		.vt_pixel_clk = 139520000,
-		.op_pixel_clk = 139520000,
-		.binning_factor = 1,
+			.y_output = 0x09A0,             
+			.line_length_pclk   = 0x0D70,   
+			.frame_length_lines = 0x09E0,   
+			.vt_pixel_clk = 139520000,
+			.op_pixel_clk = 139520000,
+			.binning_factor = 1,
 	},
 	{
-	
+
 		.x_output = 0x0668,             
 		.y_output = 0x04D0,             
 		.line_length_pclk   = 0x06E0,   
@@ -841,7 +562,7 @@ static struct msm_sensor_output_info_t imx111_dimensions[] = {
 		.binning_factor = 1,
 	},
 	{
-	
+
 		.x_output = 0x0668,             
 		.y_output = 0x039C,             
 		.line_length_pclk   = 0x06E0,   
@@ -851,7 +572,7 @@ static struct msm_sensor_output_info_t imx111_dimensions[] = {
 		.binning_factor = 1,
 	},
 	{
-	
+
 		.x_output = 0x0668,             
 		.y_output = 0x04D0,             
 		.line_length_pclk   = 0x06E0,   
@@ -861,7 +582,7 @@ static struct msm_sensor_output_info_t imx111_dimensions[] = {
 		.binning_factor = 2,
 	},
 	{
-	
+
 		.x_output = 0x0CD0,             
 		.y_output = 0x0742,             
 		.line_length_pclk   = 0x0D70,   
@@ -871,7 +592,7 @@ static struct msm_sensor_output_info_t imx111_dimensions[] = {
 		.binning_factor = 1,
 	},
 	{
-	
+
 		.x_output = 0x0CD0,             
 		.y_output = 0x09A0,             
 		.line_length_pclk   = 0x0D70,   
@@ -880,9 +601,8 @@ static struct msm_sensor_output_info_t imx111_dimensions[] = {
 		.op_pixel_clk = 139520000,
 		.binning_factor = 1,
 	},
-
 	{
-	
+
 		.x_output = 0x0668,             
 		.y_output = 0x04D0,             
 		.line_length_pclk   = 0x06E0,   
@@ -946,7 +666,6 @@ static struct msm_sensor_exp_gain_info_t imx111_exp_gain_info = {
 	.vert_offset = 5,
 };
 
-
 #define OTP_READ_BANK_ADDR               0x34C9
 #define OTP_READ_BANK_MAX                0x0F
 #define OTP_READ_BANK_DATA_SIZE          0x08
@@ -959,164 +678,120 @@ static int32_t imx111_sensor_otp_read(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int32_t rc = 0;
 
-    char bank = 0x00;
-    int  read_offset;
-    uint16_t* opt_data_uint16;
-    uint16_t read_addr = OTP_READ_OUT_REGISTER_START_ADDR;
+	char bank = 0x00;
+	int  read_offset;
+	uint16_t* opt_data_uint16;
+	uint16_t read_addr = OTP_READ_OUT_REGISTER_START_ADDR;
 
-    for( bank = 0; bank <= OTP_READ_BANK_MAX; bank++)
-    {
-    	rc = msm_camera_i2c_write(
-    			s_ctrl->sensor_i2c_client,
-     			OTP_READ_BANK_ADDR,
-    			bank,
-    			MSM_CAMERA_I2C_BYTE_DATA);
+	for ( bank = 0; bank <= OTP_READ_BANK_MAX; bank++) {
+		rc = msm_camera_i2c_write(
+				s_ctrl->sensor_i2c_client,
+				OTP_READ_BANK_ADDR,
+				bank,
+				MSM_CAMERA_I2C_BYTE_DATA);
 
-        if(rc < 0){
-            pr_err("%s: i2c_write failed\n", __func__);
-            return rc;
-        }
+		if (rc < 0){
+			pr_err("%s: i2c_write failed\n", __func__);
+			return rc;
+		}
 
-        for( read_offset = 0; read_offset < OTP_READ_BANK_DATA_SIZE ; read_offset+=sizeof(uint16_t) )
-        {
-        	rc = msm_camera_i2c_read(
-    			s_ctrl->sensor_i2c_client,
-    			read_addr, 
-    			(uint16_t*)&otp_data[bank*OTP_READ_BANK_DATA_SIZE + read_offset],
-    			sizeof(uint16_t));
+		for( read_offset = 0; read_offset < OTP_READ_BANK_DATA_SIZE ; read_offset+=sizeof(uint16_t) )
+		{
+			rc = msm_camera_i2c_read(
+					s_ctrl->sensor_i2c_client,
+					read_addr, 
+					(uint16_t*)&otp_data[bank*OTP_READ_BANK_DATA_SIZE + read_offset],
+					sizeof(uint16_t));
 
-            if(rc < 0){
-                pr_err("%s: i2c_read failed\n", __func__);
-                return rc;
-            }
-
-
-            read_addr = read_addr + sizeof(uint16_t);
-    	}
-    }
-    
-    
-    read_addr = 0;
-    opt_data_uint16 = (uint16_t*)&otp_data[0];
+			if(rc < 0){
+				pr_err("%s: i2c_read failed\n", __func__);
+				return rc;
+			}
 
 
+			read_addr = read_addr + sizeof(uint16_t);
+		}
+	}
 
+	read_addr = 0;
+	opt_data_uint16 = (uint16_t*)&otp_data[0];
 
-
-
-
-
-
-
-
-    return rc;
+	return rc;
 }
 
 int32_t msm_sensor_imx111_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	struct msm_camera_sensor_info *data = s_ctrl->sensordata;
 	CDBG("%s\n", __func__);
-	
+
 	printk("imx111.c %s: start\n", __func__);
 
-    
-    msleep(IMX111_WAIT_PWOFF_MCLK);
-    
-    gpio_direction_output(IMX111_GPIO_CAM_MCLK0, 0);
 
+	msleep(IMX111_WAIT_PWOFF_MCLK);
 
+	gpio_direction_output(IMX111_GPIO_CAM_MCLK0, 0);
 
-    msm_cam_clk_enable(&s_ctrl->sensor_i2c_client->client->dev,
-        imx111_cam_clk_info, &s_ctrl->cam_clk, ARRAY_SIZE(imx111_cam_clk_info), 0);
-    msm_camera_enable_vreg(&s_ctrl->sensor_i2c_client->client->dev,
-        s_ctrl->sensordata->sensor_platform_info->cam_vreg,
-        s_ctrl->sensordata->sensor_platform_info->num_vreg,
-        s_ctrl->reg_ptr, 0);
-    msm_camera_config_vreg(&s_ctrl->sensor_i2c_client->client->dev,
-        s_ctrl->sensordata->sensor_platform_info->cam_vreg,
-        s_ctrl->sensordata->sensor_platform_info->num_vreg,
-        s_ctrl->reg_ptr, 0);
-    msm_camera_request_gpio_table(data, 0);
+	msm_cam_clk_enable(&s_ctrl->sensor_i2c_client->client->dev,
+			imx111_cam_clk_info, &s_ctrl->cam_clk, ARRAY_SIZE(imx111_cam_clk_info), 0);
+	msm_camera_enable_vreg(&s_ctrl->sensor_i2c_client->client->dev,
+			s_ctrl->sensordata->sensor_platform_info->cam_vreg,
+			s_ctrl->sensordata->sensor_platform_info->num_vreg,
+			s_ctrl->reg_ptr, 0);
+	msm_camera_config_vreg(&s_ctrl->sensor_i2c_client->client->dev,
+			s_ctrl->sensordata->sensor_platform_info->cam_vreg,
+			s_ctrl->sensordata->sensor_platform_info->num_vreg,
+			s_ctrl->reg_ptr, 0);
+	msm_camera_request_gpio_table(data, 0);
 
-    kfree(s_ctrl->reg_ptr);
+	kfree(s_ctrl->reg_ptr);
 
-
-    
-    msleep(IMX111_WAIT_PWOFF_RST_L);
-    gpio_direction_output(data->sensor_platform_info->sensor_reset, 0);
+	msleep(IMX111_WAIT_PWOFF_RST_L);
+	gpio_direction_output(data->sensor_platform_info->sensor_reset, 0);
 	gpio_free(data->sensor_platform_info->sensor_reset);
 
-    
-    msleep(IMX111_WAIT_PWOFF_VREG_L11);
-    
-    if (cam_vana){
+	msleep(IMX111_WAIT_PWOFF_VREG_L11);
+
+	if (cam_vana) {
 		regulator_set_optimum_mode(cam_vana, 0);
 		regulator_set_voltage(cam_vana, 0, CAM_VANA_MAXUV);
 		regulator_disable(cam_vana);
 		regulator_put(cam_vana);
 		cam_vana = NULL;
-    }
+	}
 
-    
-    msleep(IMX111_WAIT_PWOFF_V_EN1);
-    
-    gpio_direction_output(IMX111_GPIO_CAM_V_EN1, 0);
-    gpio_free(IMX111_GPIO_CAM_V_EN1);
+	msleep(IMX111_WAIT_PWOFF_V_EN1);
 
-    
-    msleep(IMX111_WAIT_PWOFF_V_EN2);
+	gpio_direction_output(IMX111_GPIO_CAM_V_EN1, 0);
+	gpio_free(IMX111_GPIO_CAM_V_EN1);
 
-    gpio_free(IMX111_GPIO_CAM_I2C_SDA);
-    gpio_free(IMX111_GPIO_CAM_I2C_SCL);
+	msleep(IMX111_WAIT_PWOFF_V_EN2);
 
-    
-    pm8xxx_gpio_config(IMX111_PMGPIO_CAM_V_EN2, &imx111_cam_v_en2_off);
+	gpio_free(IMX111_GPIO_CAM_I2C_SDA);
+	gpio_free(IMX111_GPIO_CAM_I2C_SCL);
 
-    
-    msleep(IMX111_WAIT_PWOFF_V_EN3);
-    
-    gpio_direction_output(IMX111_GPIO_CAM_V_EN3, 0);
-    gpio_free(IMX111_GPIO_CAM_V_EN3);
 
-    
-    msleep(IMX111_WAIT_PWOFF_VREG_L12);
-    
-    if (cam_vdig) {
-        regulator_set_voltage(cam_vdig, 0, CAM_VDIG_MAXUV);
-        regulator_set_optimum_mode(cam_vdig, 0);
-        regulator_disable(cam_vdig);
-        regulator_put(cam_vdig);
-        cam_vdig = NULL;
-    }
+	pm8xxx_gpio_config(IMX111_PMGPIO_CAM_V_EN2, &imx111_cam_v_en2_off);
+
+	msleep(IMX111_WAIT_PWOFF_V_EN3);
+
+	gpio_direction_output(IMX111_GPIO_CAM_V_EN3, 0);
+	gpio_free(IMX111_GPIO_CAM_V_EN3);
+
+	msleep(IMX111_WAIT_PWOFF_VREG_L12);
+
+	if (cam_vdig) {
+		regulator_set_voltage(cam_vdig, 0, CAM_VDIG_MAXUV);
+		regulator_set_optimum_mode(cam_vdig, 0);
+		regulator_disable(cam_vdig);
+		regulator_put(cam_vdig);
+		cam_vdig = NULL;
+	}
 
 	printk("imx111.c %s: end\n", __func__);
 	return 0;
 }
 
 int32_t msm_sensor_imx111_power_up(struct msm_sensor_ctrl_t *s_ctrl)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 {
 	int32_t rc = 0;
 
@@ -1126,56 +801,50 @@ int32_t msm_sensor_imx111_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 	CDBG("%s: %d\n", __func__, __LINE__);
 	printk("imx111.c %s: start\n", __func__);
 
+	s_ctrl->reg_ptr = kzalloc(sizeof(struct regulator *)
+			* data->sensor_platform_info->num_vreg, GFP_KERNEL);
+	if (!s_ctrl->reg_ptr) {
+		pr_err("%s: could not allocate mem for regulators\n",
+				__func__);
+		return -ENOMEM;
+	}
 
+	rc = msm_camera_request_gpio_table(data, 1);
+	if (rc < 0) {
+		pr_err("%s: request gpio failed\n", __func__);
+		msm_sensor_imx111_power_down(s_ctrl);
+		return -EFAULT;
+	}
 
+	rc = msm_camera_config_vreg(&s_ctrl->sensor_i2c_client->client->dev,
+			s_ctrl->sensordata->sensor_platform_info->cam_vreg,
+			s_ctrl->sensordata->sensor_platform_info->num_vreg,
+			s_ctrl->reg_ptr, 1);
+	if (rc < 0) {
+		pr_err("%s: regulator on failed\n", __func__);
+		msm_sensor_imx111_power_down(s_ctrl);
+		return -EFAULT;
+	}
 
-    s_ctrl->reg_ptr = kzalloc(sizeof(struct regulator *)
-            * data->sensor_platform_info->num_vreg, GFP_KERNEL);
-    if (!s_ctrl->reg_ptr) {
-        pr_err("%s: could not allocate mem for regulators\n",
-            __func__);
-        return -ENOMEM;
-    }
+	rc = msm_camera_enable_vreg(&s_ctrl->sensor_i2c_client->client->dev,
+			s_ctrl->sensordata->sensor_platform_info->cam_vreg,
+			s_ctrl->sensordata->sensor_platform_info->num_vreg,
+			s_ctrl->reg_ptr, 1);
+	if (rc < 0) {
+		pr_err("%s: enable regulator failed\n", __func__);
+		msm_sensor_imx111_power_down(s_ctrl);
+		return -EFAULT;
+	}
 
-    rc = msm_camera_request_gpio_table(data, 1);
-    if (rc < 0) {
-        pr_err("%s: request gpio failed\n", __func__);
-        msm_sensor_imx111_power_down(s_ctrl);
-        return -EFAULT;
-    }
+	rc = gpio_request(IMX111_GPIO_CAM_V_EN3, SENSOR_NAME);
+	if (rc < 0) {
+		CDBG("IMX111_GPIO_CAM_V_EN3(%d) Error, rc = %d\n", IMX111_GPIO_CAM_V_EN3, rc);
+		msm_sensor_imx111_power_down(s_ctrl);
+		return -EFAULT;
+	}
 
-    rc = msm_camera_config_vreg(&s_ctrl->sensor_i2c_client->client->dev,
-            s_ctrl->sensordata->sensor_platform_info->cam_vreg,
-            s_ctrl->sensordata->sensor_platform_info->num_vreg,
-            s_ctrl->reg_ptr, 1);
-    if (rc < 0) {
-        pr_err("%s: regulator on failed\n", __func__);
-        msm_sensor_imx111_power_down(s_ctrl);
-        return -EFAULT;
-    }
+	gpio_direction_output(IMX111_GPIO_CAM_V_EN3, 1);
 
-    rc = msm_camera_enable_vreg(&s_ctrl->sensor_i2c_client->client->dev,
-            s_ctrl->sensordata->sensor_platform_info->cam_vreg,
-            s_ctrl->sensordata->sensor_platform_info->num_vreg,
-            s_ctrl->reg_ptr, 1);
-    if (rc < 0) {
-        pr_err("%s: enable regulator failed\n", __func__);
-        msm_sensor_imx111_power_down(s_ctrl);
-        return -EFAULT;
-    }
-
-
-
-    rc = gpio_request(IMX111_GPIO_CAM_V_EN3, SENSOR_NAME);
-    if (rc < 0) {
-        CDBG("IMX111_GPIO_CAM_V_EN3(%d) Error, rc = %d\n", IMX111_GPIO_CAM_V_EN3, rc);
-        msm_sensor_imx111_power_down(s_ctrl);
-        return -EFAULT;
-    }
-    
-    gpio_direction_output(IMX111_GPIO_CAM_V_EN3, 1);
-
-    
 	if (cam_vdig == NULL) {
 		cam_vdig = regulator_get(&s_ctrl->sensor_i2c_client->client->dev, "cam_vdig");
 		if (IS_ERR(cam_vdig)) {
@@ -1184,15 +853,15 @@ int32_t msm_sensor_imx111_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 			rc = -1;
 		}
 		if (regulator_set_voltage(cam_vdig, CAM_VDIG_MINUV,
-			CAM_VDIG_MAXUV)) {
+					CAM_VDIG_MAXUV)) {
 			CDBG("%s: VREG CAM VDIG set voltage failed\n",
-				__func__);
+					__func__);
 			rc = -1;
 		}
 		if (regulator_set_optimum_mode(cam_vdig,
-			CAM_VDIG_LOAD_UA) < 0) {
+					CAM_VDIG_LOAD_UA) < 0) {
 			CDBG("%s: VREG CAM VDIG set optimum mode failed\n",
-				__func__);
+					__func__);
 			rc = -1;
 		}
 		if (regulator_enable(cam_vdig)) {
@@ -1201,50 +870,44 @@ int32_t msm_sensor_imx111_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 		}
 	}
 
-    
-    mdelay(IMX111_WAIT_PWON_EN2);
+	mdelay(IMX111_WAIT_PWON_EN2);
 
-    
-    rc = pm8xxx_gpio_config(IMX111_PMGPIO_CAM_V_EN2, &imx111_cam_v_en2_on);
-    if (rc) {
-        
-        CDBG("IMX111_PMGPIO_CAM_V_EN2(%d) Error, rc = %d\n", IMX111_PMGPIO_CAM_V_EN2, rc);
-        msm_sensor_imx111_power_down(s_ctrl);
-        return -EFAULT;
-    }
+	rc = pm8xxx_gpio_config(IMX111_PMGPIO_CAM_V_EN2, &imx111_cam_v_en2_on);
+	if (rc) {
 
+		CDBG("IMX111_PMGPIO_CAM_V_EN2(%d) Error, rc = %d\n", IMX111_PMGPIO_CAM_V_EN2, rc);
+		msm_sensor_imx111_power_down(s_ctrl);
+		return -EFAULT;
+	}
 
-    rc = gpio_request(IMX111_GPIO_CAM_I2C_SDA, SENSOR_NAME);
-    if (rc < 0) {
-        CDBG("IMX111_GPIO_CAM_I2C_SDA(%d) Error, rc = %d\n", IMX111_GPIO_CAM_V_EN3, rc);
-        msm_sensor_imx111_power_down(s_ctrl);
-        return -EFAULT;
-    }
-    rc = gpio_request(IMX111_GPIO_CAM_I2C_SCL, SENSOR_NAME);
-    if (rc < 0) {
-        CDBG("IMX111_GPIO_CAM_I2C_SCL(%d) Error, rc = %d\n", IMX111_GPIO_CAM_V_EN3, rc);
-        msm_sensor_imx111_power_down(s_ctrl);
-        return -EFAULT;
-    }
+	rc = gpio_request(IMX111_GPIO_CAM_I2C_SDA, SENSOR_NAME);
+	if (rc < 0) {
+		CDBG("IMX111_GPIO_CAM_I2C_SDA(%d) Error, rc = %d\n", IMX111_GPIO_CAM_V_EN3, rc);
+		msm_sensor_imx111_power_down(s_ctrl);
+		return -EFAULT;
+	}
+	rc = gpio_request(IMX111_GPIO_CAM_I2C_SCL, SENSOR_NAME);
+	if (rc < 0) {
+		CDBG("IMX111_GPIO_CAM_I2C_SCL(%d) Error, rc = %d\n", IMX111_GPIO_CAM_V_EN3, rc);
+		msm_sensor_imx111_power_down(s_ctrl);
+		return -EFAULT;
+	}
 
+	mdelay(IMX111_WAIT_PWON_EN1);
 
-    
-    mdelay(IMX111_WAIT_PWON_EN1);
-    
-    rc = gpio_request(IMX111_GPIO_CAM_V_EN1, SENSOR_NAME);
-    if (!rc) {
-        CDBG("%s: cam_v_en on\n", __func__);
-        gpio_direction_output(IMX111_GPIO_CAM_V_EN1, 1);
-    } else {
-        
-        CDBG("VDD_CAM2_V_EN1(%d) Error, rc = %d\n", IMX111_GPIO_CAM_V_EN3, rc);
-        msm_sensor_imx111_power_down(s_ctrl);
-        return -EFAULT;
-    }
-    
-    
-    mdelay(IMX111_WAIT_PWON_VREG_L11);
-    
+	rc = gpio_request(IMX111_GPIO_CAM_V_EN1, SENSOR_NAME);
+	if (!rc) {
+		CDBG("%s: cam_v_en on\n", __func__);
+		gpio_direction_output(IMX111_GPIO_CAM_V_EN1, 1);
+	} else {
+
+		CDBG("VDD_CAM2_V_EN1(%d) Error, rc = %d\n", IMX111_GPIO_CAM_V_EN3, rc);
+		msm_sensor_imx111_power_down(s_ctrl);
+		return -EFAULT;
+	}
+
+	mdelay(IMX111_WAIT_PWON_VREG_L11);
+
 	if (cam_vana == NULL) {
 		cam_vana = regulator_get(&s_ctrl->sensor_i2c_client->client->dev, "cam_vana");
 		if (IS_ERR(cam_vana)) {
@@ -1252,15 +915,15 @@ int32_t msm_sensor_imx111_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 			rc = -1;
 		}
 		if (regulator_set_voltage(cam_vana, CAM_VANA_MINUV,
-			CAM_VANA_MAXUV)) {
+					CAM_VANA_MAXUV)) {
 			CDBG("%s: VREG CAM VANA set voltage failed\n",
-				__func__);
+					__func__);
 			rc = -1;
 		}
 		if (regulator_set_optimum_mode(cam_vana,
-			CAM_VANA_LOAD_UA) < 0) {
+					CAM_VANA_LOAD_UA) < 0) {
 			CDBG("%s: VREG CAM VANA set optimum mode failed\n",
-				__func__);
+					__func__);
 			rc = -1;
 		}
 		if (regulator_enable(cam_vana)) {
@@ -1268,14 +931,14 @@ int32_t msm_sensor_imx111_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 			rc = -1;
 		}
 	}
-    if (rc < 0) {
-        CDBG("cam_vana enable Error, rc = %d\n", rc);
-        msm_sensor_imx111_power_down(s_ctrl);
-        return -EFAULT;
-    }
+	if (rc < 0) {
+		CDBG("cam_vana enable Error, rc = %d\n", rc);
+		msm_sensor_imx111_power_down(s_ctrl);
+		return -EFAULT;
+	}
 
-    
-    mdelay(IMX111_WAIT_PWON_RST_H);
+
+	mdelay(IMX111_WAIT_PWON_RST_H);
 	rc = gpio_request(data->sensor_platform_info->sensor_reset, SENSOR_NAME);
 	if (!rc) {
 		CDBG("%s: reset sensor\n", __func__);
@@ -1284,50 +947,42 @@ int32_t msm_sensor_imx111_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 		CDBG("%s: gpio request fail", __func__);
 	}
 
-    
-    udelay(IMX111_WAIT_PWON_CLK);
+	udelay(IMX111_WAIT_PWON_CLK);
 
+	if (s_ctrl->clk_rate != 0)
+		imx111_cam_clk_info->clk_rate = s_ctrl->clk_rate;
 
+	rc = msm_cam_clk_enable(&s_ctrl->sensor_i2c_client->client->dev,
+			imx111_cam_clk_info, &s_ctrl->cam_clk, ARRAY_SIZE(imx111_cam_clk_info), 1);
+	if (rc < 0) {
+		pr_err("%s: clk enable failed\n", __func__);
+		msm_sensor_imx111_power_down(s_ctrl);
+		return -EFAULT;
+	}
+	gpio_direction_output(IMX111_GPIO_CAM_MCLK0, 1);
 
-
-    if (s_ctrl->clk_rate != 0)
-        imx111_cam_clk_info->clk_rate = s_ctrl->clk_rate;
-
-    rc = msm_cam_clk_enable(&s_ctrl->sensor_i2c_client->client->dev,
-        imx111_cam_clk_info, &s_ctrl->cam_clk, ARRAY_SIZE(imx111_cam_clk_info), 1);
-    if (rc < 0) {
-        pr_err("%s: clk enable failed\n", __func__);
-        msm_sensor_imx111_power_down(s_ctrl);
-        return -EFAULT;
-    }
-
-
-    
-    gpio_direction_output(IMX111_GPIO_CAM_MCLK0, 1);
-
-    
-    mdelay(IMX111_WAIT_PWON_CLK_2);
+	mdelay(IMX111_WAIT_PWON_CLK_2);
 	printk("imx111.c %s: end\n", __func__);
 	return rc;
 }
 
 void imx111_set_dev_addr(struct msm_camera_eeprom_client *eclient,
-	uint16_t *reg_addr) {
+		uint16_t *reg_addr) {
 	uint16_t eprom_addr = *reg_addr;
 	if ((eprom_addr >= 0x3500) && (eprom_addr < 0x3508)) {
 		msm_camera_i2c_write(eclient->i2c_client,
-			IMX111_EEPROM_BANK_SEL_REG,
-			0x00, MSM_CAMERA_I2C_BYTE_DATA);
+				IMX111_EEPROM_BANK_SEL_REG,
+				0x00, MSM_CAMERA_I2C_BYTE_DATA);
 	}
 	if ((eprom_addr >= 0x3508) && (eprom_addr < 0x3510)) {
 		msm_camera_i2c_write(eclient->i2c_client,
-			IMX111_EEPROM_BANK_SEL_REG,
-			0x01, MSM_CAMERA_I2C_BYTE_DATA);
+				IMX111_EEPROM_BANK_SEL_REG,
+				0x01, MSM_CAMERA_I2C_BYTE_DATA);
 	}
 	if ((eprom_addr >= 0x3510) && (eprom_addr < 0x3518)) {
 		msm_camera_i2c_write(eclient->i2c_client,
-			IMX111_EEPROM_BANK_SEL_REG,
-			0x02, MSM_CAMERA_I2C_BYTE_DATA);
+				IMX111_EEPROM_BANK_SEL_REG,
+				0x02, MSM_CAMERA_I2C_BYTE_DATA);
 	}
 }
 
@@ -1379,168 +1034,148 @@ static struct msm_camera_eeprom_client imx111_eeprom_client = {
 	.data_tbl_size = ARRAY_SIZE(imx111_eeprom_data_tbl),
 };
 
-static int curr_frame_length_lines = 0; 
+static int curr_frame_length_lines = 0;
 
 int32_t imx111_sensor_setting(struct msm_sensor_ctrl_t *s_ctrl,
-			int update_type, int res)
+		int update_type, int res)
 {
 	int32_t rc = 0;
 
-    int linecount;
-    int frame_time,exposure_time; 
-    struct msm_sensor_output_info_t curr_info,new_info;
+	int linecount;
+	int frame_time,exposure_time;
+	struct msm_sensor_output_info_t curr_info,new_info;
 
 
 	printk("imx111.c %s: start %d\n", __func__,res);
 
-	curr_info = imx111_dimensions[s_ctrl->curr_res]; 
-    new_info  = imx111_dimensions[res]; 
-    if( res != 0) 
-    {
-    	v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
-    		NOTIFY_ISPIF_STREAM, (void *)ISPIF_STREAM(
-    		PIX_0, ISPIF_OFF_IMMEDIATELY));
-    	s_ctrl->func_tbl->sensor_stop_stream(s_ctrl);
-    }
-
+	curr_info = imx111_dimensions[s_ctrl->curr_res];
+	new_info  = imx111_dimensions[res];
+	if( res != 0) {
+		v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
+				NOTIFY_ISPIF_STREAM, (void *)ISPIF_STREAM(
+					PIX_0, ISPIF_OFF_IMMEDIATELY));
+		s_ctrl->func_tbl->sensor_stop_stream(s_ctrl);
+	}
 
 	if (update_type == MSM_SENSOR_REG_INIT) {
-	    curr_frame_length_lines = 0;  
+		curr_frame_length_lines = 0;
 		s_ctrl->curr_csi_params = NULL;
-        rc = msm_sensor_enable_debugfs(s_ctrl);
-        if(rc < 0){
-            
-            CDBG("%s: msm_sensor_enable_debugfs (rc:%d)\n", __func__,rc);
-        }
-        rc = msm_sensor_write_init_settings(s_ctrl);
-        if(rc < 0){
-            printk("%s: msm_sensor_write_init_settings (rc:%d)\n", __func__,rc);
-            return rc;
-        }
+		rc = msm_sensor_enable_debugfs(s_ctrl);
+		if(rc < 0){
+
+			CDBG("%s: msm_sensor_enable_debugfs (rc:%d)\n", __func__,rc);
+		}
+		rc = msm_sensor_write_init_settings(s_ctrl);
+		if(rc < 0){
+			printk("%s: msm_sensor_write_init_settings (rc:%d)\n", __func__,rc);
+			return rc;
+		}
 
 
 	} else if (update_type == MSM_SENSOR_UPDATE_PERIODIC) {
+		if( s_ctrl->curr_res != MSM_SENSOR_INVALID_RES)
+		{
+			CDBG("imx111.c %s: setting change %d -> %d\n", __func__,
+					s_ctrl->curr_res,res);
+			if (curr_info.frame_length_lines > curr_frame_length_lines ) {
+				linecount = curr_info.frame_length_lines;
+			} else {
+				linecount = curr_frame_length_lines;
+			}
 
+			frame_time = 1000/(curr_info.vt_pixel_clk/(curr_info.line_length_pclk*linecount));
+			if ( res != 0 ) {
+				CDBG("imx111.c %s: current frame_out_time = %d line_length_pclk =%d linecount = %d vt_pixel_clk = %d\n", __func__,frame_time,curr_info.line_length_pclk,linecount,curr_info.vt_pixel_clk);
+				msleep(frame_time);
+			}
 
-        if( s_ctrl->curr_res != MSM_SENSOR_INVALID_RES)
-        {
-	        CDBG("imx111.c %s: setting change %d -> %d\n", __func__,s_ctrl->curr_res,res);
-            if (curr_info.frame_length_lines > curr_frame_length_lines )
-            {
-                linecount = curr_info.frame_length_lines;
-            }else{
-                linecount = curr_frame_length_lines;
-            }
-            frame_time = 1000/(curr_info.vt_pixel_clk/(curr_info.line_length_pclk*linecount));
+		}
 
-            if( res != 0 )
-            {
-                
-                CDBG("imx111.c %s: current frame_out_time = %d line_length_pclk =%d linecount = %d vt_pixel_clk = %d\n", __func__,frame_time,curr_info.line_length_pclk,linecount,curr_info.vt_pixel_clk);
-                msleep(frame_time);
-            }
+		curr_frame_length_lines = new_info.frame_length_lines; 
+		exposure_time = 1000/(new_info.vt_pixel_clk/(new_info.line_length_pclk*new_info.frame_length_lines)); 
 
-        }
-
-        
-        curr_frame_length_lines = new_info.frame_length_lines; 
-        exposure_time = 1000/(new_info.vt_pixel_clk/(new_info.line_length_pclk*new_info.frame_length_lines)); 
-
-	    if( s_ctrl->curr_res != 0 && res == 0)
-	    {
-            
-
-            
-		    rc = msm_camera_i2c_write_tbl(s_ctrl->sensor_i2c_client,
-			    (struct msm_camera_i2c_reg_conf *)
-			    imx111_comm_confs[0].conf,
-			    imx111_comm_confs[0].size,
-			    imx111_comm_confs[0].data_type);
-
-            if(rc < 0){
-                return rc;
-            }
-
-
-            
+		if( s_ctrl->curr_res != 0 && res == 0) {
+			rc = msm_camera_i2c_write_tbl(s_ctrl->sensor_i2c_client,
+					(struct msm_camera_i2c_reg_conf *)
+					imx111_comm_confs[0].conf,
+					imx111_comm_confs[0].size,
+					imx111_comm_confs[0].data_type);
+			if (rc < 0){
+				return rc;
+			}
 			rc = msm_sensor_write_res_settings(s_ctrl, res);
-
-            if(rc < 0){
-                return rc;
-            }
-
+			if (rc < 0){
+				return rc;
+			}
 			if (s_ctrl->curr_csi_params != s_ctrl->csi_params[res]) {
 				s_ctrl->curr_csi_params = s_ctrl->csi_params[res];
 				v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
-					NOTIFY_CSID_CFG,
-					&s_ctrl->curr_csi_params->csid_params);
+						NOTIFY_CSID_CFG,
+						&s_ctrl->curr_csi_params->csid_params);
 				v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
-					NOTIFY_CID_CHANGE, NULL);
+						NOTIFY_CID_CHANGE, NULL);
 				mb();
 				v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
-					NOTIFY_CSIPHY_CFG,
-					&s_ctrl->curr_csi_params->csiphy_params);
+						NOTIFY_CSIPHY_CFG,
+						&s_ctrl->curr_csi_params->csiphy_params);
 				mb();
 				msleep(20);
 			}
 			v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
-				NOTIFY_PCLK_CHANGE, &s_ctrl->msm_sensor_reg->
-				output_settings[res].op_pixel_clk);
+					NOTIFY_PCLK_CHANGE, &s_ctrl->msm_sensor_reg->
+					output_settings[res].op_pixel_clk);
 			v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
-				NOTIFY_ISPIF_STREAM, (void *)ISPIF_STREAM(
-				PIX_0, ISPIF_ON_FRAME_BOUNDARY));
+					NOTIFY_ISPIF_STREAM, (void *)ISPIF_STREAM(
+						PIX_0, ISPIF_ON_FRAME_BOUNDARY));
 
 			rc = msm_camera_i2c_write_tbl(s_ctrl->sensor_i2c_client,
-				(struct msm_camera_i2c_reg_conf *)
-				imx111_comm_confs[1].conf,
-				imx111_comm_confs[1].size,
-				imx111_comm_confs[1].data_type);
+					(struct msm_camera_i2c_reg_conf *)
+					imx111_comm_confs[1].conf,
+					imx111_comm_confs[1].size,
+					imx111_comm_confs[1].data_type);
 
-            if(rc < 0){
-                return rc;
-            }
-
+			if (rc < 0){
+				return rc;
+			}
 			s_ctrl->func_tbl->sensor_start_stream(s_ctrl);
 			msleep(10);
-
-            
 			rc = msm_camera_i2c_write_tbl(s_ctrl->sensor_i2c_client,
-				(struct msm_camera_i2c_reg_conf *)
-				imx111_comm_confs[2].conf,
-				imx111_comm_confs[2].size,
-				imx111_comm_confs[2].data_type);
+					(struct msm_camera_i2c_reg_conf *)
+					imx111_comm_confs[2].conf,
+					imx111_comm_confs[2].size,
+					imx111_comm_confs[2].data_type);
 
-            if(rc < 0){
-                return rc;
-            }
+			if (rc < 0){
+				return rc;
+			}
 
-        } else {
+		} else {
 			rc = msm_sensor_write_res_settings(s_ctrl, res);
 
-           if(rc < 0){
-                return rc;
-            }
+			if(rc < 0){
+				return rc;
+			}
 
 			if (s_ctrl->curr_csi_params != s_ctrl->csi_params[res]) {
 				s_ctrl->curr_csi_params = s_ctrl->csi_params[res];
 				v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
-					NOTIFY_CSID_CFG,
-					&s_ctrl->curr_csi_params->csid_params);
+						NOTIFY_CSID_CFG,
+						&s_ctrl->curr_csi_params->csid_params);
 				v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
-					NOTIFY_CID_CHANGE, NULL);
+						NOTIFY_CID_CHANGE, NULL);
 				mb();
 				v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
-					NOTIFY_CSIPHY_CFG,
-					&s_ctrl->curr_csi_params->csiphy_params);
+						NOTIFY_CSIPHY_CFG,
+						&s_ctrl->curr_csi_params->csiphy_params);
 				mb();
 				msleep(20);
 			}
 			v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
-				NOTIFY_PCLK_CHANGE, &s_ctrl->msm_sensor_reg->
-				output_settings[res].op_pixel_clk);
+					NOTIFY_PCLK_CHANGE, &s_ctrl->msm_sensor_reg->
+					output_settings[res].op_pixel_clk);
 			v4l2_subdev_notify(&s_ctrl->sensor_v4l2_subdev,
-				NOTIFY_ISPIF_STREAM, (void *)ISPIF_STREAM(
-				PIX_0, ISPIF_ON_FRAME_BOUNDARY));
+					NOTIFY_ISPIF_STREAM, (void *)ISPIF_STREAM(
+						PIX_0, ISPIF_ON_FRAME_BOUNDARY));
 			s_ctrl->func_tbl->sensor_start_stream(s_ctrl);
 
 			msleep(exposure_time);
@@ -1562,230 +1197,145 @@ int32_t imx111_sensor_write_exp_gain1(struct msm_sensor_ctrl_t *s_ctrl,
 	if (line > (fl_lines - offset))
 		fl_lines = line + offset;
 
-    curr_frame_length_lines = fl_lines; 
+	curr_frame_length_lines = fl_lines; 
 	CDBG("\n%s:Gain:%d, Linecount:%d\n", __func__, gain, line);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		s_ctrl->func_tbl->sensor_group_hold_on(s_ctrl);
-		rc = msm_camera_i2c_write(s_ctrl->sensor_i2c_client,
+	s_ctrl->func_tbl->sensor_group_hold_on(s_ctrl);
+	rc = msm_camera_i2c_write(s_ctrl->sensor_i2c_client,
 			s_ctrl->sensor_output_reg_addr->frame_length_lines,
 			fl_lines, MSM_CAMERA_I2C_WORD_DATA);
 
-        if(rc < 0){
-            return rc;
-        }
+	if (rc < 0){
+		return rc;
+	}
 
-		rc = msm_camera_i2c_write(s_ctrl->sensor_i2c_client,
+	rc = msm_camera_i2c_write(s_ctrl->sensor_i2c_client,
 			s_ctrl->sensor_exp_gain_info->coarse_int_time_addr,
 			line, MSM_CAMERA_I2C_WORD_DATA);
 
-        if(rc < 0){
-            return rc;
-        }
+	if (rc < 0){
+		return rc;
+	}
 
-    if(rc >= 0){
-        rc = msm_camera_i2c_write(s_ctrl->sensor_i2c_client,
-			s_ctrl->sensor_exp_gain_info->global_gain_addr, gain,
-			MSM_CAMERA_I2C_WORD_DATA);
+	if (rc >= 0){
+		rc = msm_camera_i2c_write(s_ctrl->sensor_i2c_client,
+				s_ctrl->sensor_exp_gain_info->global_gain_addr, gain,
+				MSM_CAMERA_I2C_WORD_DATA);
 
-        if(rc < 0){
-            return rc;
-        }
-    }
-		s_ctrl->func_tbl->sensor_group_hold_off(s_ctrl);
+		if(rc < 0){
+			return rc;
+		}
+	}
+	s_ctrl->func_tbl->sensor_group_hold_off(s_ctrl);
+	return rc;
+}
 
+static int32_t imx111_get_maker_note(struct msm_sensor_ctrl_t *s_ctrl,
+		struct get_exif_maker_note_cfg *get_exif_maker_note)
+{
+	get_exif_maker_note->fd_freq        = 0x0001;
+
+	get_exif_maker_note->device_id      = imx111_id_info.sensor_id;
+	get_exif_maker_note->awb_temp       = 0x0002;
+	get_exif_maker_note->awb_gain_r     = 0x0003;
+	get_exif_maker_note->awb_gain_g     = 0x0004;
+	get_exif_maker_note->awb_gain_b     = 0x0005;
+	get_exif_maker_note->awb_saturation = 0x0006;
+
+	get_exif_maker_note->calib_rg           = *(uint16_t*)&otp_data[0x08];
+	get_exif_maker_note->calib_bg           = *(uint16_t*)&otp_data[0x0A];
+	get_exif_maker_note->calib_grgb         = *(uint16_t*)&otp_data[0x0C];
+	get_exif_maker_note->af_inf_position    = *(uint16_t*)&otp_data[0x0E];
+	get_exif_maker_note->af_1m_position     = *(uint16_t*)&otp_data[0x10];
+	get_exif_maker_note->af_macro_position  = *(uint16_t*)&otp_data[0x12];
+	get_exif_maker_note->start_current      = *(uint16_t*)&otp_data[0x14];
+	get_exif_maker_note->op_sensitivity     = *(uint16_t*)&otp_data[0x16];
+	get_exif_maker_note->trial_ver          = *(uint16_t*)&otp_data[0x06];
+	get_exif_maker_note->lot_code_date      = *(uint16_t*)&otp_data[0x72];
+	get_exif_maker_note->lot_code_num       = *(uint32_t*)&otp_data[0x74];
+	return 0;
+}
+
+static int32_t imx111_get_exif_param(struct msm_sensor_ctrl_t *s_ctrl,
+		struct get_exif_param_inf *get_exif_param)
+{
+	int32_t rc = 0;
+
+	uint16_t coarse_integration_time = 0x0000; 
+	uint16_t line_length_DVE047         = 0x0000; 
+	uint16_t fine_integration_time   = 0x0000; 
+	uint16_t analog_gain_code_global = 0x0000; 
+	uint16_t digital_gain_greenr     = 0x0000; 
+
+	rc = msm_camera_i2c_read(s_ctrl->sensor_i2c_client, 
+			0x0202, &coarse_integration_time, MSM_CAMERA_I2C_WORD_DATA);
+	if(rc < 0){
+		return rc;
+	}
+
+	rc = msm_camera_i2c_read(s_ctrl->sensor_i2c_client, 
+			0x0342, &line_length_DVE047, MSM_CAMERA_I2C_WORD_DATA);
+	if(rc < 0){
+		return rc;
+	}
+
+	rc = msm_camera_i2c_read(s_ctrl->sensor_i2c_client, 
+			0x0204, &analog_gain_code_global, MSM_CAMERA_I2C_WORD_DATA);
+	if(rc < 0){
+		return rc;
+	}
+
+	get_exif_param->coarse_integration_time = coarse_integration_time;
+	get_exif_param->line_length_DVE047         = line_length_DVE047;
+	get_exif_param->fine_integration_time   = fine_integration_time;
+	get_exif_param->analog_gain_code_global = analog_gain_code_global;
+	get_exif_param->digital_gain_greenr     = digital_gain_greenr;
 
 	return rc;
 }
 
 
-
-
-static int32_t imx111_get_maker_note(struct msm_sensor_ctrl_t *s_ctrl,
-                                      struct get_exif_maker_note_cfg *get_exif_maker_note)
-{
-
-
-    get_exif_maker_note->fd_freq        = 0x0001;      
-
-    get_exif_maker_note->device_id      = imx111_id_info.sensor_id;
-    get_exif_maker_note->awb_temp       = 0x0002;
-    get_exif_maker_note->awb_gain_r     = 0x0003;
-    get_exif_maker_note->awb_gain_g     = 0x0004;
-    get_exif_maker_note->awb_gain_b     = 0x0005;
-    get_exif_maker_note->awb_saturation = 0x0006;
-
-	get_exif_maker_note->calib_rg           = *(uint16_t*)&otp_data[0x08];  
-	get_exif_maker_note->calib_bg           = *(uint16_t*)&otp_data[0x0A];  
-	get_exif_maker_note->calib_grgb         = *(uint16_t*)&otp_data[0x0C];  
-	get_exif_maker_note->af_inf_position    = *(uint16_t*)&otp_data[0x0E];  
-	get_exif_maker_note->af_1m_position     = *(uint16_t*)&otp_data[0x10];  
-	get_exif_maker_note->af_macro_position  = *(uint16_t*)&otp_data[0x12];  
-	get_exif_maker_note->start_current      = *(uint16_t*)&otp_data[0x14];  
-	get_exif_maker_note->op_sensitivity     = *(uint16_t*)&otp_data[0x16];  
-	get_exif_maker_note->trial_ver          = *(uint16_t*)&otp_data[0x06];  
-	get_exif_maker_note->lot_code_date      = *(uint16_t*)&otp_data[0x72];  
-	get_exif_maker_note->lot_code_num       = *(uint32_t*)&otp_data[0x74];  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    return 0;
-}
-
-
-
-
-static int32_t imx111_get_exif_param(struct msm_sensor_ctrl_t *s_ctrl,
-                                      struct get_exif_param_inf *get_exif_param)
-{
-    int32_t rc = 0;
-    
-    uint16_t coarse_integration_time = 0x0000; 
-    uint16_t line_length_DVE047         = 0x0000; 
-    uint16_t fine_integration_time   = 0x0000; 
-    uint16_t analog_gain_code_global = 0x0000; 
-    uint16_t digital_gain_greenr     = 0x0000; 
-
-    rc = msm_camera_i2c_read(s_ctrl->sensor_i2c_client, 
-                             0x0202, &coarse_integration_time, MSM_CAMERA_I2C_WORD_DATA);
-    if(rc < 0){
-        return rc;
-    }
-
-    rc = msm_camera_i2c_read(s_ctrl->sensor_i2c_client, 
-                             0x0342, &line_length_DVE047, MSM_CAMERA_I2C_WORD_DATA);
-    if(rc < 0){
-        return rc;
-    }
-
-    rc = msm_camera_i2c_read(s_ctrl->sensor_i2c_client, 
-                             0x0204, &analog_gain_code_global, MSM_CAMERA_I2C_WORD_DATA);
-    if(rc < 0){
-        return rc;
-    }
-
-    get_exif_param->coarse_integration_time = coarse_integration_time; 
-    get_exif_param->line_length_DVE047         = line_length_DVE047;         
-    get_exif_param->fine_integration_time   = fine_integration_time;   
-    get_exif_param->analog_gain_code_global = analog_gain_code_global; 
-    get_exif_param->digital_gain_greenr     = digital_gain_greenr;     
-
-    return rc;
-}
-
-
-
-
 static int32_t imx111_get_eeprom_otp_info(struct msm_sensor_ctrl_t *s_ctrl,
-                                      struct eeprom_otp_info_t *eeprom_otp_info)
+		struct eeprom_otp_info_t *eeprom_otp_info)
 {
 
-    eeprom_otp_info->otp_bank00 = *(uint64_t*)&otp_data[0x00]; 
-    eeprom_otp_info->otp_bank01 = *(uint64_t*)&otp_data[0x08]; 
-    eeprom_otp_info->otp_bank02 = *(uint64_t*)&otp_data[0x10]; 
-    eeprom_otp_info->otp_bank03 = *(uint64_t*)&otp_data[0x18]; 
-    eeprom_otp_info->otp_bank04 = *(uint64_t*)&otp_data[0x20]; 
-    eeprom_otp_info->otp_bank05 = *(uint64_t*)&otp_data[0x28]; 
-    eeprom_otp_info->otp_bank06 = *(uint64_t*)&otp_data[0x30]; 
-    eeprom_otp_info->otp_bank07 = *(uint64_t*)&otp_data[0x38]; 
-    eeprom_otp_info->otp_bank08 = *(uint64_t*)&otp_data[0x40]; 
-    eeprom_otp_info->otp_bank09 = *(uint64_t*)&otp_data[0x48]; 
-    eeprom_otp_info->otp_bank10 = *(uint64_t*)&otp_data[0x50]; 
-    eeprom_otp_info->otp_bank11 = *(uint64_t*)&otp_data[0x58]; 
-    eeprom_otp_info->otp_bank12 = *(uint64_t*)&otp_data[0x60]; 
-    eeprom_otp_info->otp_bank13 = *(uint64_t*)&otp_data[0x68]; 
-    eeprom_otp_info->otp_bank14 = *(uint64_t*)&otp_data[0x70]; 
-    eeprom_otp_info->otp_bank15 = *(uint64_t*)&otp_data[0x78]; 
-    return 0;
+	eeprom_otp_info->otp_bank00 = *(uint64_t*)&otp_data[0x00];
+	eeprom_otp_info->otp_bank01 = *(uint64_t*)&otp_data[0x08];
+	eeprom_otp_info->otp_bank02 = *(uint64_t*)&otp_data[0x10];
+	eeprom_otp_info->otp_bank03 = *(uint64_t*)&otp_data[0x18];
+	eeprom_otp_info->otp_bank04 = *(uint64_t*)&otp_data[0x20];
+	eeprom_otp_info->otp_bank05 = *(uint64_t*)&otp_data[0x28];
+	eeprom_otp_info->otp_bank06 = *(uint64_t*)&otp_data[0x30];
+	eeprom_otp_info->otp_bank07 = *(uint64_t*)&otp_data[0x38];
+	eeprom_otp_info->otp_bank08 = *(uint64_t*)&otp_data[0x40];
+	eeprom_otp_info->otp_bank09 = *(uint64_t*)&otp_data[0x48];
+	eeprom_otp_info->otp_bank10 = *(uint64_t*)&otp_data[0x50];
+	eeprom_otp_info->otp_bank11 = *(uint64_t*)&otp_data[0x58];
+	eeprom_otp_info->otp_bank12 = *(uint64_t*)&otp_data[0x60];
+	eeprom_otp_info->otp_bank13 = *(uint64_t*)&otp_data[0x68];
+	eeprom_otp_info->otp_bank14 = *(uint64_t*)&otp_data[0x70];
+	eeprom_otp_info->otp_bank15 = *(uint64_t*)&otp_data[0x78];
+	return 0;
 }
-
-
-
 
 
 static int32_t imx111_get_device_id(struct msm_sensor_ctrl_t *s_ctrl, uint16_t *device_id)
 {
-    int32_t rc = 0;
-    uint16_t chipid = 0xFFFF;
+	int32_t rc = 0;
+	uint16_t chipid = 0xFFFF;
 
-    rc = msm_camera_i2c_read(s_ctrl->sensor_i2c_client, 
-                             s_ctrl->sensor_id_info->sensor_id_reg_addr, &chipid, 
-                             MSM_CAMERA_I2C_WORD_DATA);
-    if (rc < 0) {
-        pr_err("%s: msm_camera_i2c_read failed rc=%d\n", __func__,rc);
-        return rc;
-    }
+	rc = msm_camera_i2c_read(s_ctrl->sensor_i2c_client, 
+			s_ctrl->sensor_id_info->sensor_id_reg_addr, &chipid, 
+			MSM_CAMERA_I2C_WORD_DATA);
+	if (rc < 0) {
+		pr_err("%s: msm_camera_i2c_read failed rc=%d\n", __func__,rc);
+		return rc;
+	}
 
-    *device_id = chipid;
+	*device_id = chipid;
 
-    return rc;
+	return rc;
 }
-
 
 
 static int __init msm_sensor_init_module(void)
@@ -1823,11 +1373,11 @@ static struct msm_sensor_fn_t imx111_func_tbl = {
 
 	.sensor_power_down = msm_sensor_imx111_power_down,
 	.sensor_set_parm_pm_obs = msm_sensor_set_parm_pm_obs,
-    .sensor_get_maker_note = imx111_get_maker_note,
-    .sensor_get_exif_param = imx111_get_exif_param,
-    .sensor_get_eeprom_otp_info = imx111_get_eeprom_otp_info,
-    .sensor_otp_read = imx111_sensor_otp_read,
-    .sensor_get_device_id = imx111_get_device_id,
+	.sensor_get_maker_note = imx111_get_maker_note,
+	.sensor_get_exif_param = imx111_get_exif_param,
+	.sensor_get_eeprom_otp_info = imx111_get_eeprom_otp_info,
+	.sensor_otp_read = imx111_sensor_otp_read,
+	.sensor_get_device_id = imx111_get_device_id,
 };
 
 static struct msm_sensor_reg_t imx111_regs = {
@@ -1864,7 +1414,6 @@ static struct msm_sensor_ctrl_t imx111_s_ctrl = {
 	.sensor_v4l2_subdev_info_size = ARRAY_SIZE(imx111_subdev_info),
 	.sensor_v4l2_subdev_ops = &imx111_subdev_ops,
 	.func_tbl = &imx111_func_tbl,
-
 	.clk_rate = MSM_SENSOR_MCLK_25HZ,
 
 };

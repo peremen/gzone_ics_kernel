@@ -22,16 +22,10 @@
 
 #define ST21NFCA_MAGIC	0xEA
 
-
-
-
-
-
-
 #define ST21NFCA_GET_WAKEUP	_IOR(ST21NFCA_MAGIC, 0x01, unsigned int)
 
 struct st21nfca_i2c_platform_data {
 	unsigned int irq_gpio;
-  unsigned int ena_gpio;
-  unsigned int polarity_mode;
+	unsigned int ena_gpio;
+	unsigned int polarity_mode;
 };

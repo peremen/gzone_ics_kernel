@@ -21,11 +21,9 @@
 #ifdef MSM_CAMERA_BIONIC
 #include <sys/types.h>
 
-
-
 #endif
 
-#include "camera_function.h" 
+#include "camera_function.h"
 
 #include <linux/types.h>
 #include <linux/ioctl.h>
@@ -835,18 +833,9 @@ struct msm_snapshot_pp_status {
 #define CFG_SET_HDR_BRIGHTNESS      99
 #define CFG_SET_CAP_MODE_ENABLE    100
 #define CFG_GET_DEVICE_ID          101
-
 #define CFG_GET_TEMPERATURE_VAL    102
-
-
 #define CFG_GET_EXPOSURE_INFO      103
-
 #define CFG_MAX					   104 
-
-
-
-
-
 
 #define MOVE_NEAR	0
 #define MOVE_FAR	1
@@ -948,10 +937,6 @@ struct msm_snapshot_pp_status {
 /* QRD */
 #define CFG_SET_EXPOSURE_COMPENSATION 35
 
-
-
-
-
 #define CAMERA_SCENE_MODE_OFF                   0
 #define CAMERA_SCENE_MODE_AUTO                  1
 #define CAMERA_SCENE_MODE_LANDSCAPE             2
@@ -996,17 +981,11 @@ struct msm_snapshot_pp_status {
 #define CAMERA_EXPOSURE_COMPENSATION_LV3			-6
 #define CAMERA_EXPOSURE_COMPENSATION_LV4			-12
 
-
-
 #define CAMERA_AE_MODE_AUTO     (0)  
 #define CAMERA_AE_MODE_MANUAL   (1)  
 
-
-
-
 #define CAMERA_DVE018_MODE    0    
 #define CAMERA_REC_MODE         1    
-
 
 #define CAMERA_FPS_MODE_QUICK_SCENE_OFF_SHAKE_AUTO      0
 #define CAMERA_FPS_MODE_QUICK_SCENE_OFF_SHAKE_OFF       1
@@ -1147,19 +1126,19 @@ struct af_mode_cfg {
 
 
 struct set_manual_step_cfg{
- uint8_t   direct;                  
- uint8_t   step_h;                  
- uint8_t   step_l;                  
- uint8_t   af_fv_max_h;             
- uint8_t   af_fv_max_l;             
- uint8_t   af_fv_min_h;             
- uint8_t   af_fv_min_l;             
- uint8_t   af_fv_now_h;             
- uint8_t   af_fv_now_l;             
- uint8_t   af_lens_pos_fv_max_h;    
- uint8_t   af_lens_pos_fv_max_l;    
- uint8_t   af_lens_pos_now_h;       
- uint8_t   af_lens_pos_now_l;       
+	uint8_t   direct;                  
+	uint8_t   step_h;                  
+	uint8_t   step_l;                  
+	uint8_t   af_fv_max_h;             
+	uint8_t   af_fv_max_l;             
+	uint8_t   af_fv_min_h;             
+	uint8_t   af_fv_min_l;             
+	uint8_t   af_fv_now_h;             
+	uint8_t   af_fv_now_l;             
+	uint8_t   af_lens_pos_fv_max_h;    
+	uint8_t   af_lens_pos_fv_max_l;    
+	uint8_t   af_lens_pos_now_h;       
+	uint8_t   af_lens_pos_now_l;       
 };
 
 
@@ -1282,150 +1261,126 @@ struct cord {
 	uint32_t y;
 };
 
-
-
 typedef struct {
-  int mode;
-  int sw;
+	int mode;
+	int sw;
 } DVE022_pm_obs_data_t;
 
 
 struct get_exif_param_inf{
-    uint16_t coarse_integration_time;      
-    uint16_t line_length_DVE047;              
-    uint16_t fine_integration_time;        
-    uint16_t analog_gain_code_global;      
-    uint16_t digital_gain_greenr;          
+	uint16_t coarse_integration_time;      
+	uint16_t line_length_DVE047;              
+	uint16_t fine_integration_time;        
+	uint16_t analog_gain_code_global;      
+	uint16_t digital_gain_greenr;          
 };
 
 
 struct get_exif_param_mm{
-    
-    uint32_t  cur_line_count;         
-    uint32_t  line_count;             
-    uint16_t  line_length_pclk;       
-    uint32_t  vt_pixel_clk;           
+	uint32_t  cur_line_count;         
+	uint32_t  line_count;             
+	uint16_t  line_length_pclk;       
+	uint32_t  vt_pixel_clk;           
 
-    uint16_t  frame_length_lines;     
+	uint16_t  frame_length_lines;     
+	float     cur_real_gain;          
+	float     real_gain;              
+	float     iso100_gain;            
 
-    
-    float     cur_real_gain;          
-    float     real_gain;              
-    float     iso100_gain;            
-
-    uint16_t  fine_integration_time;  
+	uint16_t  fine_integration_time;  
 
 };
 
 struct get_exif_param_t{
-  struct get_exif_param_inf   exif_param;
-  struct get_exif_param_mm    exif_param_mm;
+	struct get_exif_param_inf   exif_param;
+	struct get_exif_param_mm    exif_param_mm;
 };
-
 
 struct get_exif_maker_note_cfg{
-    uint32_t fd_freq;              
-    uint16_t device_id;            
-    uint16_t awb_temp;             
-    uint16_t awb_gain_r;           
-    uint16_t awb_gain_g;           
-    uint16_t awb_gain_b;           
-    uint16_t awb_saturation;       
-    uint16_t calib_rg;             
-    uint16_t calib_bg;             
-    uint16_t calib_grgb;           
-    uint16_t af_inf_position;      
-    uint16_t af_1m_position;       
-    uint16_t af_macro_position;    
+	uint32_t fd_freq;              
+	uint16_t device_id;            
+	uint16_t awb_temp;             
+	uint16_t awb_gain_r;           
+	uint16_t awb_gain_g;           
+	uint16_t awb_gain_b;           
+	uint16_t awb_saturation;       
+	uint16_t calib_rg;             
+	uint16_t calib_bg;             
+	uint16_t calib_grgb;           
+	uint16_t af_inf_position;      
+	uint16_t af_1m_position;       
+	uint16_t af_macro_position;    
 
-    uint16_t af_down_inf_position; 
-    uint16_t af_up_macro_position; 
+	uint16_t af_down_inf_position; 
+	uint16_t af_up_macro_position; 
 
-    uint16_t start_current;        
-    uint16_t op_sensitivity;       
-    uint16_t trial_ver;            
-    uint16_t lot_code_date;        
-    uint32_t lot_code_num;         
-
-
-
-
-
-
-
-
-
-
-
-
-
+	uint16_t start_current;        
+	uint16_t op_sensitivity;       
+	uint16_t trial_ver;            
+	uint16_t lot_code_date;        
+	uint32_t lot_code_num;         
 };
-
 
 
 struct get_exif_maker_note_mm{
-  
-  float     awb_gain_r;             
-  float     awb_gain_g;             
-  float     awb_gain_b;             
-  
-  float     white_average_rg;       
-  float     white_average_bg;       
-  
-  float     regular_average_rg;     
-  float     regular_average_bg;     
-  
-  int cur_focus_val;                
-  int cur_pos;                      
-  
-  uint32_t  fd_freq;                
+	float     awb_gain_r;
+	float     awb_gain_g;
+	float     awb_gain_b;
+
+	float     white_average_rg;
+	float     white_average_bg;
+
+	float     regular_average_rg;
+	float     regular_average_bg;
+
+	int cur_focus_val;
+	int cur_pos;
+
+	uint32_t  fd_freq;
 };
 
 struct get_exif_maker_note{
-  struct get_exif_maker_note_mm     get_maker_note_mm;
-  struct get_exif_maker_note_cfg    get_maker_note_cfg;
+	struct get_exif_maker_note_mm     get_maker_note_mm;
+	struct get_exif_maker_note_cfg    get_maker_note_cfg;
 };
 
-
 struct eeprom_otp_info_t{
-    uint64_t    otp_bank00; 
-    uint64_t    otp_bank01; 
-    uint64_t    otp_bank02; 
-    uint64_t    otp_bank03; 
-    uint64_t    otp_bank04; 
-    uint64_t    otp_bank05; 
-    uint64_t    otp_bank06; 
-    uint64_t    otp_bank07; 
-    uint64_t    otp_bank08; 
-    uint64_t    otp_bank09; 
-    uint64_t    otp_bank10; 
-    uint64_t    otp_bank11; 
-    uint64_t    otp_bank12; 
-    uint64_t    otp_bank13; 
-    uint64_t    otp_bank14; 
-    uint64_t    otp_bank15; 
+	uint64_t    otp_bank00;
+	uint64_t    otp_bank01;
+	uint64_t    otp_bank02;
+	uint64_t    otp_bank03;
+	uint64_t    otp_bank04;
+	uint64_t    otp_bank05;
+	uint64_t    otp_bank06;
+	uint64_t    otp_bank07;
+	uint64_t    otp_bank08;
+	uint64_t    otp_bank09;
+	uint64_t    otp_bank10;
+	uint64_t    otp_bank11;
+	uint64_t    otp_bank12;
+	uint64_t    otp_bank13;
+	uint64_t    otp_bank14;
+	uint64_t    otp_bank15;
 };
 
 struct hdr_brightness_t{
-    int8_t   set_pattern;
+	int8_t   set_pattern;
 
-    uint16_t coarse_integration_time;
-    uint16_t line_length_DVE047;
-    uint16_t fine_integration_time;
-    uint16_t analogue_gain_code_greenr;
-    uint16_t analogue_gain_code_greenb;
-    uint16_t analogue_gain_code_red;
-    uint16_t analogue_gain_code_blue;
+	uint16_t coarse_integration_time;
+	uint16_t line_length_DVE047;
+	uint16_t fine_integration_time;
+	uint16_t analogue_gain_code_greenr;
+	uint16_t analogue_gain_code_greenb;
+	uint16_t analogue_gain_code_red;
+	uint16_t analogue_gain_code_blue;
 };
-
 
 #if defined(FEATURE_DVE021_LED_AUTO)
 struct led_lux_idx_t{
-    int16_t maxSensitivityluxIdx;
-    int16_t luxIdx;
+	int16_t maxSensitivityluxIdx;
+	int16_t luxIdx;
 };
-#endif 
-
+#endif
 
 struct sensor_cfg_data {
 	int cfgtype;
@@ -1453,7 +1408,6 @@ struct sensor_cfg_data {
 		struct sensor_output_info_t output_info;
 		struct sensor_eeprom_data_t eeprom_data;
 
-
 		DVE022_pm_obs_data_t pm_obs;
 
 		/* QRD */
@@ -1471,24 +1425,24 @@ struct sensor_cfg_data {
 		uint8_t pict_size;
 		uint8_t scene;
 
-		struct ae_cfg ae;				
-		struct af_mode_cfg af_mode;		
+		struct ae_cfg ae;
+		struct af_mode_cfg af_mode;
 
-        struct get_exif_param_inf get_exif_param;           
-        struct get_exif_maker_note_cfg get_exif_maker_note; 
-		struct eeprom_otp_info_t eeprom_otp_info; 
+		struct get_exif_param_inf get_exif_param;
+		struct get_exif_maker_note_cfg get_exif_maker_note;
+		struct eeprom_otp_info_t eeprom_otp_info;
 
-        struct set_manual_step_cfg set_manual_step;
+		struct set_manual_step_cfg set_manual_step;
 
 		uint8_t frame_rate_mode;
-        struct hdr_brightness_t hdr_brightness;
-        uint8_t cap_mode_enable;
-        uint16_t device_id;
+		struct hdr_brightness_t hdr_brightness;
+		uint8_t cap_mode_enable;
+		uint16_t device_id;
 
-        int temperature;
+		int temperature;
 
 
-        uint16_t fine_integration_time;
+		uint16_t fine_integration_time;
 
 	} cfg;
 };
@@ -1627,14 +1581,9 @@ struct img_plane_info {
 	uint8_t vpe_can_use;
 };
 
-
-
-
 enum msm_sensor_onoff {
-  SENSOR_OFF = 0,  
-  SENSOR_ON  = 1   
+	SENSOR_OFF = 0,
+	SENSOR_ON  = 1
 };
-
-
 
 #endif /* __LINUX_MSM_CAMERA_H */

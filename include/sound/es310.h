@@ -16,17 +16,16 @@
 #define __LINUX_SND_ES310_H
 
 struct es310_platform_data {
-    
 	int reset_gpio;
 	int wakeup_gpio;
 	int mic1_gpio;
 	int mic2_gpio;
 
 	int (*power_on)(int on);
-	int (*dev_setup)(bool on);	
-	int (*aud_clk)(int on);	  
+	int (*dev_setup)(bool on);
+	int (*aud_clk)(int on);	
 
-	bool read_fw_bin; 
+	bool read_fw_bin;
 };
 
 #endif

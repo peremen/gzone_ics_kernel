@@ -343,16 +343,9 @@ extern int root_mountflags;
 
 extern bool early_boot_irqs_disabled;
 
-
-
-
 extern void set_kernel_panic_log(int enable);
 extern void set_kernel_panic_magic_num(void);
 extern void save_kernel_panic_log(char* p);
-
-
-
-
 
 /* Values used for system_state */
 extern enum system_states {

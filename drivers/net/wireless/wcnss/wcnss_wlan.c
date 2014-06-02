@@ -222,10 +222,9 @@ static struct platform_driver wcnss_wlan_ctrl_driver = {
 	.remove	= __devexit_p(wcnss_wlan_ctrl_remove),
 };
 
-
 int get_wcnss_diag(void)
 {
-    return wcnss_diag_value;
+	return wcnss_diag_value;
 }
 EXPORT_SYMBOL(get_wcnss_diag);
 

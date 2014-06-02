@@ -28,10 +28,8 @@
 #include <mach/dma.h>
 #include <linux/dma-mapping.h>
 
-
 #include <asm/setup.h>
 #include <mach/board_DVE073.h>
-
 
 #include <mach/board.h>
 #include <mach/msm_iomap.h>
@@ -1104,7 +1102,6 @@ int __init msm_add_sdcc(unsigned int controller, struct mmc_platform_data *plat)
 	return platform_device_register(pdev);
 }
 
-
 static struct resource resources_qup_i2c_gsbi1[] = {
 	{
 		.name	= "gsbi_qup_i2c_addr",
@@ -1126,13 +1123,12 @@ static struct resource resources_qup_i2c_gsbi1[] = {
 	},
 };
 
-struct platform_device msm8960_device_qup_i2c_gsbi1 = { 
+struct platform_device msm8960_device_qup_i2c_gsbi1 = {
 	.name		= "qup_i2c",
 	.id		= 1,
 	.num_resources	= ARRAY_SIZE(resources_qup_i2c_gsbi1),
 	.resource	= resources_qup_i2c_gsbi1,
 };
-
 
 static struct resource resources_qup_i2c_gsbi4[] = {
 	{
@@ -1189,8 +1185,6 @@ struct platform_device msm8960_device_qup_i2c_gsbi3 = {
 	.num_resources	= ARRAY_SIZE(resources_qup_i2c_gsbi3),
 	.resource	= resources_qup_i2c_gsbi3,
 };
-
-
 
 static struct resource resources_qup_i2c_gsbi8[] = {
 	{
@@ -1619,68 +1613,6 @@ struct platform_device msm8960_device_ssbi_pmic = {
 	.num_resources  = ARRAY_SIZE(resources_ssbi_pmic),
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 static struct resource ram_console_resource[] = {
 	{
 		.name = "ram_console",
@@ -1706,9 +1638,6 @@ void __init add_ramconsole_devices(void)
 
 	platform_device_register(&ram_console_device);
 }
-
-
-
 
 static struct resource fatal_info_resource[] = {
 	{
@@ -2205,11 +2134,7 @@ static struct clk_lookup msm_clocks_8960_dummy[] = {
 	CLK_DUMMY("core_clk",	GSBI10_UART_CLK,	NULL, OFF),
 	CLK_DUMMY("core_clk",	GSBI11_UART_CLK,	NULL, OFF),
 	CLK_DUMMY("core_clk",	GSBI12_UART_CLK,	NULL, OFF),
-
-
-
 	CLK_DUMMY("core_clk",	GSBI1_QUP_CLK,		"qup_i2c.1", OFF),
-
 	CLK_DUMMY("core_clk",	GSBI2_QUP_CLK,		NULL, OFF),
 	CLK_DUMMY("core_clk",	GSBI3_QUP_CLK,		NULL, OFF),
 	CLK_DUMMY("core_clk",	GSBI4_QUP_CLK,		"qup_i2c.4", OFF),
@@ -2241,11 +2166,7 @@ static struct clk_lookup msm_clocks_8960_dummy[] = {
 	CLK_DUMMY("sys_clk",		USB_FS2_SYS_CLK,	NULL, OFF),
 	CLK_DUMMY("iface_clk",		CE2_CLK,	     "qce.0", OFF),
 	CLK_DUMMY("core_clk",		CE1_CORE_CLK,	     "qce.0", OFF),
-
-
-
 	CLK_DUMMY("iface_clk",		GSBI1_P_CLK, "qup_i2c.1", OFF),
-
 	CLK_DUMMY("iface_clk",		GSBI2_P_CLK,
 						  "msm_serial_hsl.0", OFF),
 	CLK_DUMMY("iface_clk",		GSBI3_P_CLK,		NULL, OFF),

@@ -134,11 +134,10 @@ int32_t msm_actuator_move_focus(
 	}
 
 
-	if(a_ctrl->step_position_table == NULL){
+	if (a_ctrl->step_position_table == NULL){
 		pr_err("%s: step_position_table failed (null)\n",__func__);
 		return -EINVAL;
 	}
-
 
 	curr_lens_pos = a_ctrl->step_position_table[a_ctrl->curr_step_pos];
 
@@ -152,17 +151,6 @@ int32_t msm_actuator_move_focus(
 			target_step_pos = dest_step_pos;
 			target_lens_pos =
 				a_ctrl->step_position_table[target_step_pos];
-
-
-
-
-
-
-
-
-
-
-
 			rc = a_ctrl->func_tbl.
 				actuator_write_focus(
 					a_ctrl,
@@ -172,28 +160,15 @@ int32_t msm_actuator_move_focus(
 						ringing_params[curr_scene]),
 					sign_dir,
 					target_lens_pos);
-
-            if(rc < 0){
-                return -EINVAL;
-            } else {
-                curr_lens_pos = (uint16_t)rc;
-            }
-
+			if (rc < 0){
+				return -EINVAL;
+			} else {
+				curr_lens_pos = (uint16_t)rc;
+			}
 		} else {
 			target_step_pos = step_boundary;
 			target_lens_pos =
 				a_ctrl->step_position_table[target_step_pos];
-
-
-
-
-
-
-
-
-
-
-
 			rc = a_ctrl->func_tbl.
 				actuator_write_focus(
 					a_ctrl,
@@ -203,13 +178,11 @@ int32_t msm_actuator_move_focus(
 						ringing_params[curr_scene]),
 					sign_dir,
 					target_lens_pos);
-
-            if(rc < 0){
-                return -EINVAL;
-            } else {
-                curr_lens_pos = (uint16_t)rc;
-            }
-
+			if(rc < 0){
+				return -EINVAL;
+			} else {
+				curr_lens_pos = (uint16_t)rc;
+			}
 			a_ctrl->curr_region_index += sign_dir;
 		}
 		a_ctrl->curr_step_pos = target_step_pos;
@@ -223,12 +196,7 @@ int32_t msm_actuator_init_table(
 {
 	int16_t code_per_step = 0;
 	int32_t rc = 0;
-
-
 	int32_t cur_code = 0;
-
-
-
 
 	int16_t step_index = 0, region_index = 0;
 	uint16_t step_boundary = 0;
@@ -247,11 +215,7 @@ int32_t msm_actuator_init_table(
 	}
 	cur_code = a_ctrl->initial_code;
 	a_ctrl->step_position_table[step_index++] = cur_code;
-
-
 	cur_code = cur_code << 8;
-
-
 	for (region_index = 0;
 		region_index < a_ctrl->region_size;
 		region_index++) {
@@ -270,13 +234,7 @@ int32_t msm_actuator_init_table(
 		for (; step_index <= step_boundary;
 			step_index++) {
 			cur_code += code_per_step;
-
-
 			a_ctrl->step_position_table[step_index] = cur_code >> 8;
-
-
-
-
 		}
 	}
 	for (step_index = 0;
@@ -299,23 +257,15 @@ int32_t msm_actuator_set_default_focus(
 	int32_t rc = 0;
 	LINFO("%s called\n", __func__);
 
-
 	if (!a_ctrl->step_position_table){
 		if(a_ctrl->func_tbl.actuator_init_table){
 			rc = a_ctrl->func_tbl.actuator_init_table(a_ctrl);
-	        if(rc < 0){
+			if(rc < 0){
 				pr_err("%s: actuator_init_table failed rc = %d\n",__func__,rc);
-	            return rc;
+				return rc;
 			}
-        }
-    }
-
-
-
-
-
-
-
+		}
+	}
 
 	if (a_ctrl->curr_step_pos != 0)
 		rc = a_ctrl->func_tbl.actuator_move_focus(a_ctrl, MOVE_FAR,
@@ -330,8 +280,7 @@ int32_t msm_actuator_af_power_down(struct msm_actuator_ctrl_t *a_ctrl)
 	int32_t rc = 0;
 	LINFO("%s called\n", __func__);
 
-
-	if((a_ctrl == NULL) || (a_ctrl->step_position_table == NULL)){
+	if ((a_ctrl == NULL) || (a_ctrl->step_position_table == NULL)){
 		pr_err("%s: failed null pointer\n",__func__);
 		return rc;
 	}
@@ -346,22 +295,6 @@ int32_t msm_actuator_af_power_down(struct msm_actuator_ctrl_t *a_ctrl)
 	a_ctrl->step_position_table = NULL;
 
 	return rc;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 int32_t msm_actuator_config(
@@ -475,13 +408,10 @@ static int msm_actuator_get_move(void *data, u64 *val)
 	struct msm_actuator_ctrl_t *a_ctrl = (struct msm_actuator_ctrl_t *)data;
 	int32_t rc = 0;
 
-
 	rc = a_ctrl->func_tbl.actuator_set_default_focus(a_ctrl);
-    
-    if(rc < 0){
-        return -EFAULT;
-    }
-
+	if (rc < 0){
+		return -EFAULT;
+	}
 	return 0;
 }
 
@@ -490,16 +420,12 @@ static int msm_actuator_set_move(void *data, u64 val)
 	struct msm_actuator_ctrl_t *a_ctrl = (struct msm_actuator_ctrl_t *)data;
 	int32_t rc = 0;
 
-
-
-
 	rc = a_ctrl->func_tbl.actuator_move_focus(a_ctrl, (val & 0xFF00) >> 8,
-		(val & 0xFF));
+			(val & 0xFF));
 
-    if(rc < 0){
-        return -EFAULT;
-    }
-
+	if (rc < 0){
+		return -EFAULT;
+	}
 	return 0;
 }
 

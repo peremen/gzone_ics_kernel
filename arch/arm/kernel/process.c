@@ -49,23 +49,14 @@ unsigned long __stack_chk_guard __read_mostly;
 EXPORT_SYMBOL(__stack_chk_guard);
 #endif
 
-
-
-
-
 struct fatal_mmu_regs {
-	
 	unsigned long cp15_sctlr;
 	unsigned long cp15_ttb0;
 	unsigned long cp15_ttb1;
-	unsigned long cp15_dacr;	
-	
-	
-
+	unsigned long cp15_dacr;
 };
 
 extern void save_cpu_mmu_register_dump(struct pt_regs* regs, unsigned int sel_cpu, struct fatal_mmu_regs mmu_regs);
-
 
 
 static const char *processor_modes[] = {
@@ -394,12 +385,8 @@ void __show_regs_fatal(struct pt_regs *regs)
 {
 	unsigned long flags;
 	char buf[64];
-
-
-
-
 	unsigned int sel;
-struct fatal_mmu_regs mmu;
+	struct fatal_mmu_regs mmu;
 
 	set_kernel_panic_log(1);
 
@@ -424,10 +411,7 @@ struct fatal_mmu_regs mmu;
 	printk("r3 : %08lx  r2 : %08lx  r1 : %08lx  r0 : %08lx\n",
 		regs->ARM_r3, regs->ARM_r2,
 		regs->ARM_r1, regs->ARM_r0);
-
-
 	set_kernel_panic_log(0);
-
 
 	flags = regs->ARM_cpsr;
 	buf[0] = flags & PSR_N_BIT ? 'N' : 'n';
@@ -442,12 +426,9 @@ struct fatal_mmu_regs mmu;
 		processor_modes[processor_mode(regs)],
 		isa_modes[isa_mode(regs)],
 		get_fs() == get_ds() ? "kernel" : "user");
-
 	{
 		unsigned int ctrl;
-
 		buf[0] = '\0';
-
 		{
 			unsigned int transbase, dac;
 			asm("mrc p15, 0, %0, c2, c0\n\t"
@@ -455,9 +436,6 @@ struct fatal_mmu_regs mmu;
 			    : "=r" (transbase), "=r" (dac));
 			snprintf(buf, sizeof(buf), "  Table: %08x  DAC: %08x",
 			  	transbase, dac);
-
-
-
 			sel = raw_smp_processor_id();
 			asm("mrc p15, 0, %0, c1, c0, 0\n"
 			: "=r" (mmu.cp15_sctlr));
@@ -467,30 +445,14 @@ struct fatal_mmu_regs mmu;
 			: "=r" (mmu.cp15_ttb1));
 			asm("mrc p15, 0, %0, c3, c0, 0\n"
 			: "=r" (mmu.cp15_dacr));
-			
-			
-			
-			
-
 
 		}
-
 		asm("mrc p15, 0, %0, c1, c0\n" : "=r" (ctrl));
-
 		printk("Control: %08x%s\n", ctrl, buf);
-
-
-
 		save_cpu_mmu_register_dump(regs,sel,mmu);
-
-
-
 	}
-
-
 	show_extra_register_data(regs, 128);
 }
-
 
 void __show_regs(struct pt_regs *regs)
 {
@@ -564,7 +526,6 @@ void show_regs(struct pt_regs * regs)
 	__backtrace();
 }
 
-
 void show_regs_fatal(struct pt_regs * regs)
 {
 	printk("\n");
@@ -572,7 +533,6 @@ void show_regs_fatal(struct pt_regs * regs)
 	__show_regs_fatal(regs);
 	__backtrace();
 }
-
 
 ATOMIC_NOTIFIER_HEAD(thread_notify_head);
 

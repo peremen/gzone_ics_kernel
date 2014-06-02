@@ -4338,7 +4338,6 @@ void tabla_mbhc_init(struct snd_soc_codec *codec)
 
 	snd_soc_update_bits(codec, TABLA_A_MBHC_SCALING_MUX_2, 0xF0, 0xF0);
 
-	 
 	snd_soc_update_bits(codec, TABLA_A_MICB_1_MBHC, 0x03,tabla->mbhc_cfg.micbias);	
 }
 
@@ -4885,13 +4884,11 @@ tabla_codec_get_plug_type(struct snd_soc_codec *codec, bool highhph)
 	/* make sure override is on */
 	WARN_ON(!(snd_soc_read(codec, TABLA_A_CDC_MBHC_B1_CTL) & 0x04));
 
-	
 	plug_type_ptr =
 	    TABLA_MBHC_CAL_PLUG_TYPE_PTR(tabla->mbhc_cfg.calibration);
 	plug_type[0] = PLUG_TYPE_INVALID;
 
 	snd_soc_update_bits(codec, 0x12E, 0x40, TABLA_CFILT_FAST_MODE);
-	
 
 	/* performs DCEs for N times
 	 * 1st: check if voltage is in invalid range
@@ -4943,11 +4940,6 @@ tabla_codec_get_plug_type(struct snd_soc_codec *codec, bool highhph)
 			 i + 1, mb_v[i] & 0xffff, mic_mv[i], scaled, gndswitch,
 			 inval);
 	}
-
-
-
-
-
 
 	for (i = 0; !inval && i < num_det; i++) {
 		/*
@@ -6455,88 +6447,35 @@ static struct platform_driver tabla1x_codec_driver = {
 	},
 };
 
-
 static int wcd9310_dev_open(struct inode *inode, struct file *file)
 {
-    pr_debug("%s - june\n", __func__);
-    return 0;
+	pr_debug("%s - june\n", __func__);
+	return 0;
 }
+
 static int wcd9310_dev_release(struct inode *inode, struct file *file)
 {
-    pr_debug("%s - june\n", __func__);
-    return 0;
+	pr_debug("%s - june\n", __func__);
+	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 static long wcd9310_dev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
-    int ret = 0;
-    
+	int ret = 0;
 
-    pr_debug("%s - june\n", __func__);
-
-    mutex_lock(&wcd9310_dev_lock);
-    switch(cmd)
-    {
-    case WCD9310_GET_ID :
-        pr_debug("%s : WCD9310_GET_ID - june\n", __func__);
-        ret = 1;
-        break;
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    default :
-        ret = 0;
-        break;
-    }
-    mutex_unlock(&wcd9310_dev_lock);
+	pr_debug("%s - june\n", __func__);
+	mutex_lock(&wcd9310_dev_lock);
+	switch(cmd)
+	{
+	case WCD9310_GET_ID :
+		pr_debug("%s : WCD9310_GET_ID - june\n", __func__);
+		ret = 1;
+		break;
+	default :
+		ret = 0;
+		break;
+	}
+	mutex_unlock(&wcd9310_dev_lock);
 	return ret;
 }
 
@@ -6553,20 +6492,17 @@ struct miscdevice wcd9310_dev = {
 	.fops	= &wcd9310_fops,
 };
 
-
-
 static int __init tabla_codec_init(void)
 {
-	int rtn = 0;	
-  
-  rtn = platform_driver_register(&tabla_codec_driver);
+	int rtn = 0;
+
+	rtn = platform_driver_register(&tabla_codec_driver);
 	if (rtn == 0) {
 		rtn = platform_driver_register(&tabla1x_codec_driver);
 		if (rtn != 0)
 			platform_driver_unregister(&tabla_codec_driver);
 	}
-
-  misc_register(&wcd9310_dev);	
+	misc_register(&wcd9310_dev);
 	return rtn;
 }
 

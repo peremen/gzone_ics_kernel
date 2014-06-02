@@ -828,17 +828,6 @@ bail:
 	return ret;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 static const char * const pm8921_rev_names[] = {
 	[PM8XXX_REVISION_8921_TEST]	= "test",
 	[PM8XXX_REVISION_8921_1p0]	= "1.0",
@@ -930,9 +919,7 @@ static int __devinit pm8921_probe(struct platform_device *pdev)
 		pr_err("Cannot read restart reason rc=%d\n", rc);
 		goto err_read_rev;
 	}
-	
-	
-	
+
 	val &= PM8XXX_RESTART_REASON_MASK;
 	pr_info("PMIC Restart Reason: %s\n", pm8xxx_restart_reason_str[val]);
 	pmic->restart_reason = val;

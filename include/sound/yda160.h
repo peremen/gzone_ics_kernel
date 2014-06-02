@@ -16,13 +16,12 @@
 #define __LINUX_SND_YDA160_H
 
 struct yda160_platform_data {
-    
 	int reset_gpio;
 	int spk_pwr_en_gpio;
 	int rcv_switch_gpio;
 
 	int (*power_on)(int on);
-	int (*dev_setup)(bool on);	
+	int (*dev_setup)(bool on);
 };
 
 

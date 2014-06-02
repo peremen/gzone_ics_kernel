@@ -245,15 +245,9 @@ struct msm_otg {
 	int async_int;
 	unsigned cur_power;
 	struct delayed_work chg_work;
-
 	struct delayed_work pmic_id_status_work;
-
-
 	struct delayed_work adc_test_work;
-
-
 	struct delayed_work chg_check_work;
-
 	enum usb_chg_state chg_state;
 	enum usb_chg_type chg_type;
 	u8 dcd_retries;
@@ -261,9 +255,7 @@ struct msm_otg {
 	struct notifier_block usbdev_nb;
 	unsigned mA_port;
 	struct timer_list id_timer;
-	
 	struct timer_list adc_test_timer;
-
 	unsigned long caps;
 	struct msm_xo_voter *xo_handle;
 	uint32_t bus_perf_client;

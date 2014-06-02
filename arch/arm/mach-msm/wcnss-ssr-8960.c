@@ -31,11 +31,8 @@
 #include "smd_private.h"
 #include "ramdump.h"
 
-
 #include <mach/restart.h>
 #include <mach/board_DVE073.h>
-
-
 
 #define MODULE_NAME			"wcnss_8960"
 #define MAX_BUF_SIZE			0x51
@@ -69,16 +66,10 @@ static void smsm_state_cb_hdlr(void *data, uint32_t old_state,
 		return;
 	}
 
-	if (!enable_riva_ssr)
-	{
-	
-
-	    m7_set_magic_for_subsystem("riva");
+	if (!enable_riva_ssr) {
+		m7_set_magic_for_subsystem("riva");
 		msm_set_restart_mode(0x29A95003);
-
-	
-	
-		panic(MODULE_NAME ": SMSM reset request received from Riva");	
+		panic(MODULE_NAME ": SMSM reset request received from Riva");
 	}
 
 	smem_reset_reason = smem_get_entry(SMEM_SSR_REASON_WCNSS0,
@@ -115,14 +106,9 @@ static irqreturn_t riva_wdog_bite_irq_hdlr(int irq, void *dev_id)
 		return IRQ_HANDLED;
 	}
 
-	if (!enable_riva_ssr)
-	{
-	
-
-	    m7_set_magic_for_subsystem("riva");
+	if (!enable_riva_ssr) {
+		m7_set_magic_for_subsystem("riva");
 		msm_set_restart_mode(0x29A95003);
-
-	
 		panic(MODULE_NAME ": Watchdog bite received from Riva");
 	}
 

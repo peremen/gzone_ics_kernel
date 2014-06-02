@@ -46,12 +46,10 @@
 
 #include <mach/clk.h>
 #include <mach/msm_xo.h>
-#include <mach/gpio.h> 
+#include <mach/gpio.h>
 #include <mach/msm_bus.h>
 
-
 #include <linux/switch.h>
-
 
 #include <mach/irqs.h>
 #include <linux/mfd/pm8xxx/pm8xxx-adc.h>
@@ -973,17 +971,15 @@ static void msm_otg_notify_charger(struct msm_otg *motg, unsigned mA)
 		mA = IDEV_ACA_CHG_LIMIT;
 
 
-	if((motg->chg_type == USB_SDP_CHARGER) && mA == 0){
+	if ((motg->chg_type == USB_SDP_CHARGER) && mA == 0) {
 		mA = 500;
 	}
 
 
-
-	if(check_charger_mode && (motg->chg_type == USB_SDP_CHARGER)){
-		mA =0;
-		pm8921_disable_source_current(false); 
+	if (check_charger_mode && (motg->chg_type == USB_SDP_CHARGER)) {
+		mA = 0;
+		pm8921_disable_source_current(false);
 	}
-
 
 	if (msm_otg_notify_chg_type(motg))
 		dev_err(motg->otg.dev,
@@ -1904,27 +1900,23 @@ static void msm_otg_init_sm(struct msm_otg *motg)
 	}
 }
 
-
 #if USE_INTR_FROM_VBUS
 int msm_usb_adc_read(void)
 {
 	struct pm8xxx_adc_chan_result result;
 
 	pm8xxx_adc_mpp_config_read(PM8XXX_AMUX_MPP_3,
-							ADC_MPP_1_AMUX6, &result);
+			ADC_MPP_1_AMUX6, &result);
 
 	if (result.physical <=	USB_AUDIO_VOLTAGE_MAX && result.physical >= USB_AUDIO_VOLTAGE_MIN) {
 		switch_set_state(&sdev, USB_AUDIO_OUT);
 		printk("\n\n[DEBUG] %s\n\n", __func__);
-		return 1;	
+		return 1;
 	}
 	switch_set_state(&sdev, NO_DEVICE);
-	
 	return 0;
 }
 #endif
-
-
 
 static void msm_usb_adc_test_work(struct work_struct *w)
 {
@@ -1933,24 +1925,18 @@ static void msm_usb_adc_test_work(struct work_struct *w)
 
 	struct pm8xxx_adc_chan_result result;
 	int rc = -1;
-	 
 	printk("[DEBUG] %s start\n", __func__);
 
 	rc = pm8xxx_adc_mpp_config_read(PM8XXX_AMUX_MPP_3,
 							ADC_MPP_1_AMUX6, &result);
 
 	if (rc) {
-        printk("\n\n[DEBUG] [MSM_OTG] AMUX_MPP_3 %s : rc(%d) \n", __func__, rc);
-    } else {
-        
-        
-        
+		printk("\n\n[DEBUG] [MSM_OTG] AMUX_MPP_3 %s : rc(%d) \n", __func__, rc);
+	} else {
+
 	}
 
-
-
-	
-	if((test_bit(B_SESS_VLD, &motg->inputs))){  
+	if ((test_bit(B_SESS_VLD, &motg->inputs))){
 		if (result.physical <=	USB_AUDIO_VOLTAGE_MAX && result.physical >= USB_AUDIO_VOLTAGE_MIN) {
 			gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 1);
 			switch_set_state(&sdev, USB_AUDIO_OUT);
@@ -1958,11 +1944,10 @@ static void msm_usb_adc_test_work(struct work_struct *w)
 		}
 		else{
 			gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 0);
-			switch_set_state(&sdev, NO_DEVICE);	
-			printk("\n\n[DEBUG] USB_SEL(%d) HIGH set USB mode \n",1);			
+			switch_set_state(&sdev, NO_DEVICE);
+			printk("\n\n[DEBUG] USB_SEL(%d) HIGH set USB mode \n",1);
 		}
-	}
-	else {										
+	} else {
 		if (result.physical <=	USB_AUDIO_VOLTAGE_MAX && result.physical >= USB_AUDIO_VOLTAGE_MIN) {
 			gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 0);
 			switch_set_state(&sdev, USB_AUDIO_OUT);
@@ -1970,14 +1955,10 @@ static void msm_usb_adc_test_work(struct work_struct *w)
 		}
 		else{
 			gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 1);
-			switch_set_state(&sdev, NO_DEVICE);	
+			switch_set_state(&sdev, NO_DEVICE);
 			printk("\n\n[DEBUG] USB_SEL(%d) Low Power Mode set USB mode \n",0);
 		}
 	}
-		
-
-
-
 	schedule_delayed_work(&motg->adc_test_work, ADC_TEST_FREQ);
 }
 
@@ -2058,22 +2039,22 @@ static void msm_otg_sm_work(struct work_struct *w)
 		} else if (test_bit(B_SESS_VLD, &motg->inputs)) {
 #if USE_INTR_FROM_VBUS
 
-			if(msm_usb_adc_read()){
-				cancel_delayed_work_sync(&motg->adc_test_work);			
-                motg->chg_state = USB_CHG_STATE_DETECTED;
-                motg->chg_type = USB_DCP_CHARGER;
+			if (msm_usb_adc_read()) {
+				cancel_delayed_work_sync(&motg->adc_test_work);
+				motg->chg_state = USB_CHG_STATE_DETECTED;
+				motg->chg_type = USB_DCP_CHARGER;
 
 				msm_otg_notify_charger(motg,
 						IDEV_CHG_MAX);
 				pm_runtime_put_noidle(otg->dev);
 				pm_runtime_suspend(otg->dev);
-				
+
 				gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 1);
-				printk("\n\n\n[DEBUG] A_LP_SEL_PM %d \n\n\n", gpio_get_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM)));				
-				
+				printk("\n\n\n[DEBUG] A_LP_SEL_PM %d \n\n\n", gpio_get_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM)));
+
 				return;
-				
-			}else{
+
+			} else {
 				schedule_delayed_work(&motg->adc_test_work, ADC_TEST_FREQ);
 				gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 0);
 			}
@@ -2721,10 +2702,6 @@ struct msm_otg_platform_data *msm_otg_dt_to_pdata(struct platform_device *pdev)
 				&pdata->default_mode);
 	of_property_read_u32(node, "qcom,hsusb-otg-phy-type",
 				&pdata->phy_type);
-
-
-
-
 
 	return pdata;
 }

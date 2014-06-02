@@ -273,11 +273,6 @@ int pm8921_usb_ovp_set_hystersis(enum pm8921_usb_debounce_time ms);
  */
 int pm8921_usb_ovp_disable(int disable);
 
-
-
-
-
-
 int pm8921_is_batfet_closed(void);
 
 int pm_power_get_charger_mode(void);

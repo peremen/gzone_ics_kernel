@@ -293,11 +293,7 @@ static inline void show_state(void)
 }
 
 extern void show_regs(struct pt_regs *);
-
-
-
 extern void show_regs_fatal(struct pt_regs *);
-
 
 
 /*
@@ -819,14 +815,9 @@ enum cpu_idle_type {
  * increased costs.
  */
 
-
-
-
-
 # define SCHED_LOAD_RESOLUTION	0
 # define scale_load(w)		(w)
 # define scale_load_down(w)	(w)
-
 
 #define SCHED_LOAD_SHIFT	(10 + SCHED_LOAD_RESOLUTION)
 #define SCHED_LOAD_SCALE	(1L << SCHED_LOAD_SHIFT)

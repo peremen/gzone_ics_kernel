@@ -26,10 +26,6 @@
 #include <linux/types.h>
 #include <linux/uaccess.h>
 
-
-
-
-
 #include <linux/gpio.h>
 
 #include <mach/camera.h>
@@ -153,29 +149,27 @@ struct msm_sensor_fn_t {
 	int (*sensor_adjust_frame_lines)
 		(struct msm_sensor_ctrl_t *s_ctrl, uint16_t res);
 
-
-    
-
-    
-    int32_t (*sensor_set_scene) (struct msm_sensor_ctrl_t *, int);
-    int32_t (*sensor_set_pict_size) (struct msm_sensor_ctrl_t *, int);
-    int32_t (*sensor_set_wb) (struct msm_sensor_ctrl_t *, int);
-    int32_t (*sensor_set_effect) (struct msm_sensor_ctrl_t *, int);
-    int32_t (*sensor_set_antibanding) (struct msm_sensor_ctrl_t *, int);
-    int32_t (*sensor_set_exp_compensation) (struct msm_sensor_ctrl_t *, int);
-    int32_t (*sensor_get_maker_note) (struct msm_sensor_ctrl_t *, struct get_exif_maker_note_cfg *get_exif_maker_note);
-    int32_t (*sensor_get_exif_param) (struct msm_sensor_ctrl_t *, struct get_exif_param_inf *get_exif_param);
-    int32_t (*sensor_get_eeprom_otp_info) (struct msm_sensor_ctrl_t *, struct eeprom_otp_info_t *eeprom_otp_info);
-    int32_t (*sensor_set_frame_rate_mode) (struct msm_sensor_ctrl_t *, int);
-    int32_t (*sensor_get_hdr_brightness) (struct msm_sensor_ctrl_t *, struct hdr_brightness_t *);
-    int32_t (*sensor_set_hdr_brightness) (struct msm_sensor_ctrl_t *, struct hdr_brightness_t);
-    int32_t (*sensor_set_cap_mode_enable) (struct msm_sensor_ctrl_t *, int);
-    int32_t (*sensor_otp_read) (struct msm_sensor_ctrl_t *);
-
-    int32_t (*sensor_get_device_id) (struct msm_sensor_ctrl_t *, uint16_t *);
-
-
-    int32_t (*sensor_get_exposure_info) (struct msm_sensor_ctrl_t *, uint16_t *);
+	int32_t (*sensor_set_scene) (struct msm_sensor_ctrl_t *, int);
+	int32_t (*sensor_set_pict_size) (struct msm_sensor_ctrl_t *, int);
+	int32_t (*sensor_set_wb) (struct msm_sensor_ctrl_t *, int);
+	int32_t (*sensor_set_effect) (struct msm_sensor_ctrl_t *, int);
+	int32_t (*sensor_set_antibanding) (struct msm_sensor_ctrl_t *, int);
+	int32_t (*sensor_set_exp_compensation) (struct msm_sensor_ctrl_t *, int);
+	int32_t (*sensor_get_maker_note) (struct msm_sensor_ctrl_t *,
+			struct get_exif_maker_note_cfg *get_exif_maker_note);
+	int32_t (*sensor_get_exif_param) (struct msm_sensor_ctrl_t *,
+			struct get_exif_param_inf *get_exif_param);
+	int32_t (*sensor_get_eeprom_otp_info) (struct msm_sensor_ctrl_t *,
+			struct eeprom_otp_info_t *eeprom_otp_info);
+	int32_t (*sensor_set_frame_rate_mode) (struct msm_sensor_ctrl_t *, int);
+	int32_t (*sensor_get_hdr_brightness) (struct msm_sensor_ctrl_t *,
+			struct hdr_brightness_t *);
+	int32_t (*sensor_set_hdr_brightness) (struct msm_sensor_ctrl_t *,
+			struct hdr_brightness_t);
+	int32_t (*sensor_set_cap_mode_enable) (struct msm_sensor_ctrl_t *, int);
+	int32_t (*sensor_otp_read) (struct msm_sensor_ctrl_t *);
+	int32_t (*sensor_get_device_id) (struct msm_sensor_ctrl_t *, uint16_t *);
+	int32_t (*sensor_get_exposure_info) (struct msm_sensor_ctrl_t *, uint16_t *);
 
 };
 
@@ -287,11 +281,6 @@ long msm_sensor_subdev_ioctl(struct v4l2_subdev *sd,
 			unsigned int cmd, void *arg);
 
 struct msm_sensor_ctrl_t *get_sctrl(struct v4l2_subdev *sd);
-
-
-
-
-
 
 #define VIDIOC_MSM_SENSOR_CFG \
 	_IOWR('V', BASE_VIDIOC_PRIVATE + 10, void __user *)

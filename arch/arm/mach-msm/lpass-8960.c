@@ -29,11 +29,8 @@
 #include <mach/subsystem_restart.h>
 #include <mach/subsystem_notif.h>
 
-
 #include <mach/restart.h>
 #include <mach/board_DVE073.h>
-
-
 
 #include "smd_private.h"
 #include "ramdump.h"
@@ -78,12 +75,8 @@ static void lpass_fatal_fn(struct work_struct *work)
 {
 	pr_err("%s %s: Watchdog bite received from Q6!\n", MODULE_NAME,
 		__func__);
-
-
-    m7_set_magic_for_subsystem("lpass");
+	m7_set_magic_for_subsystem("lpass");
 	msm_set_restart_mode(0x29A93003);
-
-
 	panic(MODULE_NAME ": Resetting the SoC");
 }
 
@@ -98,12 +91,8 @@ static void lpass_smsm_state_cb(void *data, uint32_t old_state,
 		pr_err("%s: LPASS SMSM state changed to SMSM_RESET,"
 			" new_state = 0x%x, old_state = 0x%x\n", __func__,
 			new_state, old_state);
-
-
-    m7_set_magic_for_subsystem("lpass");
-	msm_set_restart_mode(0x29A93003);
-
-
+		m7_set_magic_for_subsystem("lpass");
+		msm_set_restart_mode(0x29A93003);
 		panic(MODULE_NAME ": Resetting the SoC");
 	}
 }

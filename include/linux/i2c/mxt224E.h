@@ -1,19 +1,17 @@
-
-
 /*
-* Copyright (c) 2011 M7System Co., Ltd.
-*    
-*  This program is free software; you can redistribute it and/or modify
-*  it under the terms of the GNU General Public License as published by
-*  the Free Software Foundation; either version 2 of the License, or
-*  (at your option) any later version.
-*
-*  This program is distributed in the hope that it will be useful,
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*  GNU General Public License for more details.
-*
-*/
+ * Copyright (c) 2011 M7System Co., Ltd.
+ *    
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ */
 /***********************************************************************/
 /* Modified by                                                         */
 /* (C) NEC CASIO Mobile Communications, Ltd. 2013                      */
@@ -25,91 +23,90 @@
 #define MXT224E_DEV_NAME "Atmel MXT224E"
 
 enum {
-     RESERVED_T0 = 0,
-     RESERVED_T1,
-     DEBUG_DELTAS_T2,
-     DEBUG_REFERENCES_T3,
-     DEBUG_SIGNALS_T4,
-     GEN_MESSAGEPROCESSOR_T5,
-     GEN_COMMANDPROCESSOR_T6,
-     GEN_POWERCONFIG_T7,
-     GEN_ACQUISITIONCONFIG_T8,
-     TOUCH_MULTITOUCHSCREEN_T9,
-     TOUCH_SINGLETOUCHSCREEN_T10,
-     TOUCH_XSLIDER_T11,
-     TOUCH_YSLIDER_T12,
-     TOUCH_XWHEEL_T13,
-     TOUCH_YWHEEL_T14,
-     TOUCH_KEYARRAY_T15,
-     PROCG_SIGNALFILTER_T16,
-     PROCI_LINEARIZATIONTABLE_T17,
-     SPT_COMCONFIG_T18,
-     SPT_GPIOPWM_T19,
-     PROCI_GRIPFACESUPPRESSION_T20,
-     RESERVED_T21,
-     PROCG_NOISESUPPRESSION_T22,
-     TOUCH_PROXIMITY_T23,
-     PROCI_ONETOUCHGESTUREPROCESSOR_T24,
-     SPT_SELFTEST_T25,
-     DEBUG_CTERANGE_T26,
-     PROCI_TWOTOUCHGESTUREPROCESSOR_T27,
-     SPT_CTECONFIG_T28,
-     SPT_GPI_T29,
-     SPT_GATE_T30,
-     TOUCH_KEYSET_T31,
-     TOUCH_XSLIDERSET_T32,
-     RESERVED_T33,
-     GEN_MESSAGEBLOCK_T34,
-     SPT_GENERICDATA_T35,
-     RESERVED_T36,
-     DEBUG_DIAGNOSTIC_T37,
-     SPT_USERDATA_T38,
-     SPARE_T39,
-     PROCI_GRIPSUPPRESSION_T40,
-     SPARE_T41,
-     PROCI_TOUCHSUPPRESSION_T42,
-     SPARE_T43,
-     SPARE_T44,
-     SPARE_T45,
-     SPT_CTECONFIG_T46,
-     PROCI_STYLUS_T47,
-     PROCG_NOISESUPPRESSION_T48,
-     SPARE_T49,
-     SPARE_T50,
-     MXT_MAX_OBJECT_TYPES,
-     RESERVED_T255 = 255,
+	RESERVED_T0 = 0,
+	RESERVED_T1,
+	DEBUG_DELTAS_T2,
+	DEBUG_REFERENCES_T3,
+	DEBUG_SIGNALS_T4,
+	GEN_MESSAGEPROCESSOR_T5,
+	GEN_COMMANDPROCESSOR_T6,
+	GEN_POWERCONFIG_T7,
+	GEN_ACQUISITIONCONFIG_T8,
+	TOUCH_MULTITOUCHSCREEN_T9,
+	TOUCH_SINGLETOUCHSCREEN_T10,
+	TOUCH_XSLIDER_T11,
+	TOUCH_YSLIDER_T12,
+	TOUCH_XWHEEL_T13,
+	TOUCH_YWHEEL_T14,
+	TOUCH_KEYARRAY_T15,
+	PROCG_SIGNALFILTER_T16,
+	PROCI_LINEARIZATIONTABLE_T17,
+	SPT_COMCONFIG_T18,
+	SPT_GPIOPWM_T19,
+	PROCI_GRIPFACESUPPRESSION_T20,
+	RESERVED_T21,
+	PROCG_NOISESUPPRESSION_T22,
+	TOUCH_PROXIMITY_T23,
+	PROCI_ONETOUCHGESTUREPROCESSOR_T24,
+	SPT_SELFTEST_T25,
+	DEBUG_CTERANGE_T26,
+	PROCI_TWOTOUCHGESTUREPROCESSOR_T27,
+	SPT_CTECONFIG_T28,
+	SPT_GPI_T29,
+	SPT_GATE_T30,
+	TOUCH_KEYSET_T31,
+	TOUCH_XSLIDERSET_T32,
+	RESERVED_T33,
+	GEN_MESSAGEBLOCK_T34,
+	SPT_GENERICDATA_T35,
+	RESERVED_T36,
+	DEBUG_DIAGNOSTIC_T37,
+	SPT_USERDATA_T38,
+	SPARE_T39,
+	PROCI_GRIPSUPPRESSION_T40,
+	SPARE_T41,
+	PROCI_TOUCHSUPPRESSION_T42,
+	SPARE_T43,
+	SPARE_T44,
+	SPARE_T45,
+	SPT_CTECONFIG_T46,
+	PROCI_STYLUS_T47,
+	PROCG_NOISESUPPRESSION_T48,
+	SPARE_T49,
+	SPARE_T50,
+	MXT_MAX_OBJECT_TYPES,
+	RESERVED_T255 = 255,
 };
 
 struct mxt224E_platform_data {
-     int max_finger_touches;
-     const u8 **config;
-     int gpio_read_done;
-     int min_x;
-     int max_x;
-     int min_y;
-     int max_y;
-     int min_z;
-     int max_z;
-     int min_w;
-     int max_w;
-     void (*power_on)(void);
-     void (*power_off)(void);
+	int max_finger_touches;
+	const u8 **config;
+	int gpio_read_done;
+	int min_x;
+	int max_x;
+	int min_y;
+	int max_y;
+	int min_z;
+	int max_z;
+	int min_w;
+	int max_w;
+	void (*power_on)(void);
+	void (*power_off)(void);
 };
 
 
 #define T38_USERDATA0             0
-#define T38_USERDATA1             0     
-#define T38_USERDATA2             0     
-#define T38_USERDATA3             0    
-#define T38_USERDATA4             0     
-#define T38_USERDATA5             0         
+#define T38_USERDATA1             0
+#define T38_USERDATA2             0
+#define T38_USERDATA3             0
+#define T38_USERDATA4             0
+#define T38_USERDATA5             0
 #define T38_USERDATA6             0
 #define T38_USERDATA7             0
 
 #define T7_IDLEACQINT             64
 #define T7_ACTVACQINT             255
 #define T7_ACTV2IDLETO            50
-
 
 #define T8_CHRGTIME               24        
 #define T8_CHRGTIME_TA     		  0         
@@ -122,7 +119,6 @@ struct mxt224E_platform_data {
 #define T8_ATCHCALSTHR             	1
 #define T8_ATCHFRCCALTHR          	127          
 #define T8_ATCHFRCCALRATIO          127          
-
 
 #define T9_CTRL                   139
 #define T9_XORIGIN                0
@@ -160,7 +156,6 @@ struct mxt224E_platform_data {
 #define T9_YPITCH                 0     
 #define T9_NEXTTCHDI              1        
 
-
 #define T15_CTRL                  0   
 #define T15_XORIGIN               0
 #define T15_XORIGIN_4KEY          0
@@ -175,10 +170,8 @@ struct mxt224E_platform_data {
 #define T15_RESERVED_0            0
 #define T15_RESERVED_1            0
 
-
 #define T18_CTRL                  0
 #define T18_COMMAND               0
-
 
 #define T19_CTRL                  0
 #define T19_REPORTMASK            0
@@ -197,7 +190,6 @@ struct mxt224E_platform_data {
 #define T19_TRIGGER_2             0
 #define T19_TRIGGER_3             0
 
-
 #define T23_CTRL                  0
 #define T23_XORIGIN               0
 #define T23_YORIGIN               0
@@ -210,7 +202,6 @@ struct mxt224E_platform_data {
 #define T23_AVERAGE               0
 #define T23_MVNULLRATE            0
 #define T23_MVDTHR                0
-
 
 #define T24_CTRL                  0
 #define T24_NUMGEST               0
@@ -227,7 +218,6 @@ struct mxt224E_platform_data {
 #define T24_TAPTHR                0
 #define T24_THROWTHR              0
 
-
 #define T25_CTRL                  0
 #define T25_CMD                   0
 #define T25_SIGLIM_0_UPSIGLIM     0
@@ -237,15 +227,11 @@ struct mxt224E_platform_data {
 #define T25_SIGLIM_2_UPSIGLIM     0
 #define T25_SIGLIM_2_LOSIGLIM     0
 
-
-
 #define T40_CTRL                  0
 #define T40_XLOGRIP               0
 #define T40_XHIGRIP               0
 #define T40_YLOGRIP               0
 #define T40_YHIGRIP               0
-
-
 
 #define T42_CTRL                  3
 #define T42_APPRTHR               20   
@@ -255,7 +241,6 @@ struct mxt224E_platform_data {
 #define T42_SUPEXTTO              0   
 #define T42_MAXNUMTCHS            8   
 #define T42_SHAPESTRENGTH         0   
-
 
 #define T46_CTRL                  0  
 #define T46_MODE                  3  
@@ -268,7 +253,6 @@ struct mxt224E_platform_data {
 #define T46_XSLEW                 1  
 #define T46_SYNCDELAY                 0
 
-
 #define T47_CTRL                  0
 #define T47_CONTMIN               0
 #define T47_CONTMAX               0
@@ -279,8 +263,6 @@ struct mxt224E_platform_data {
 #define T47_HOVERSUP              0
 #define T47_CONFTHR               0
 #define T47_SYNCSPERX             0
-
-
 
 #define T48_CTRL_TA                  23
 #define T48_CFG_TA                   0 
@@ -336,9 +318,6 @@ struct mxt224E_platform_data {
 #define T48_NEXTTCHDI_TA               0
 #define T48_CHGON_BIT          0x20
 
-
-
-
 #define T38_GLOVE_USERDATA0             0
 #define T38_GLOVE_USERDATA1             0     
 #define T38_GLOVE_USERDATA2             0     
@@ -352,7 +331,6 @@ struct mxt224E_platform_data {
 #define T7_GLOVE_ACTVACQINT             255
 #define T7_GLOVE_ACTV2IDLETO            50
 
-
 #define T8_GLOVE_CHRGTIME          24        
 #define T8_GLOVE_CHRGTIME_TA     0        
 #define T8_GLOVE_ATCHDRIFT              0
@@ -364,7 +342,6 @@ struct mxt224E_platform_data {
 #define T8_GLOVE_ATCHCALSTHR               1
 #define T8_GLOVE_ATCHFRCCALTHR          127          
 #define T8_GLOVE_ATCHFRCCALRATIO        127          
-
 
 #define T9_GLOVE_CTRL                   139
 #define T9_GLOVE_XORIGIN                0
@@ -402,7 +379,6 @@ struct mxt224E_platform_data {
 #define T9_GLOVE_YPITCH                 0     
 #define T9_GLOVE_NEXTTCHDI              3        
 
-
 #define T15_GLOVE_CTRL                  0   
 #define T15_GLOVE_XORIGIN               0
 #define T15_GLOVE_XORIGIN_4KEY          0
@@ -417,10 +393,8 @@ struct mxt224E_platform_data {
 #define T15_GLOVE_RESERVED_0            0
 #define T15_GLOVE_RESERVED_1            0
 
-
 #define T18_GLOVE_CTRL                  0
 #define T18_GLOVE_COMMAND               0
-
 
 #define T19_GLOVE_CTRL                  0
 #define T19_GLOVE_REPORTMASK            0
@@ -439,7 +413,6 @@ struct mxt224E_platform_data {
 #define T19_GLOVE_TRIGGER_2             0
 #define T19_GLOVE_TRIGGER_3             0
 
-
 #define T23_GLOVE_CTRL                  0
 #define T23_GLOVE_XORIGIN               0
 #define T23_GLOVE_YORIGIN               0
@@ -452,7 +425,6 @@ struct mxt224E_platform_data {
 #define T23_GLOVE_AVERAGE               0
 #define T23_GLOVE_MVNULLRATE            0
 #define T23_GLOVE_MVDTHR                0
-
 
 #define T24_GLOVE_CTRL                  0
 #define T24_GLOVE_NUMGEST               0
@@ -469,7 +441,6 @@ struct mxt224E_platform_data {
 #define T24_GLOVE_TAPTHR                0
 #define T24_GLOVE_THROWTHR              0
 
-
 #define T25_GLOVE_CTRL                  0
 #define T25_GLOVE_CMD                   0
 #define T25_GLOVE_SIGLIM_0_UPSIGLIM     0
@@ -479,15 +450,11 @@ struct mxt224E_platform_data {
 #define T25_GLOVE_SIGLIM_2_UPSIGLIM     0
 #define T25_GLOVE_SIGLIM_2_LOSIGLIM     0
 
-
-
 #define T40_GLOVE_CTRL                  0
 #define T40_GLOVE_XLOGRIP               0
 #define T40_GLOVE_XHIGRIP               0
 #define T40_GLOVE_YLOGRIP               0
 #define T40_GLOVE_YHIGRIP               0
-
-
 
 #define T42_GLOVE_CTRL                  2
 #define T42_GLOVE_APPRTHR               20   
@@ -497,7 +464,6 @@ struct mxt224E_platform_data {
 #define T42_GLOVE_SUPEXTTO              0   
 #define T42_GLOVE_MAXNUMTCHS            8   
 #define T42_GLOVE_SHAPESTRENGTH         0   
-
 
 #define T46_GLOVE_CTRL                  0  
 #define T46_GLOVE_MODE                  3  
@@ -510,7 +476,6 @@ struct mxt224E_platform_data {
 #define T46_GLOVE_XSLEW                 1 
 #define T46_GLOVE_SYNCDELAY                 0
 
-
 #define T47_GLOVE_CTRL                  0
 #define T47_GLOVE_CONTMIN               40
 #define T47_GLOVE_CONTMAX               200
@@ -521,8 +486,6 @@ struct mxt224E_platform_data {
 #define T47_GLOVE_HOVERSUP              255
 #define T47_GLOVE_CONFTHR               0
 #define T47_GLOVE_SYNCSPERX             40
-
-
 
 #define T48_GLOVE_CTRL_TA                  23
 #define T48_GLOVE_CFG_TA                   0
@@ -578,13 +541,9 @@ struct mxt224E_platform_data {
 #define T48_GLOVE_NEXTTCHDI_TA               0
 #define T48_GLOVE_CHGON_BIT          		 0x20
 
-
-
-
 #define T7_CHARGER_IDLEACQINT             255
 #define T7_CHARGER_ACTVACQINT             255
 #define T7_CHARGER_ACTV2IDLETO            50
-
 
 #define T8_CHARGER_CHRGTIME               24        
 #define T8_CHRGTIME_TA     		  0         
@@ -597,7 +556,6 @@ struct mxt224E_platform_data {
 #define T8_CHARGER_ATCHCALSTHR             	1
 #define T8_CHARGER_ATCHFRCCALTHR          	127          
 #define T8_CHARGER_ATCHFRCCALRATIO          127          
-
 
 #define T9_CHARGER_CTRL                   139
 #define T9_CHARGER_XORIGIN                0
@@ -635,7 +593,6 @@ struct mxt224E_platform_data {
 #define T9_CHARGER_YPITCH                 0     
 #define T9_CHARGER_NEXTTCHDI              1        
 
-
 #define T15_CHARGER_CTRL                  0   
 #define T15_CHARGER_XORIGIN               0
 #define T15_CHARGER_XORIGIN_4KEY          0
@@ -650,10 +607,8 @@ struct mxt224E_platform_data {
 #define T15_CHARGER_RESERVED_0            0
 #define T15_CHARGER_RESERVED_1            0
 
-
 #define T18_CHARGER_CTRL                  0
 #define T18_CHARGER_COMMAND               0
-
 
 #define T19_CHARGER_CTRL                  0
 #define T19_CHARGER_REPORTMASK            0
@@ -672,7 +627,6 @@ struct mxt224E_platform_data {
 #define T19_CHARGER_TRIGGER_2             0
 #define T19_CHARGER_TRIGGER_3             0
 
-
 #define T23_CHARGER_CTRL                  0
 #define T23_CHARGER_XORIGIN               0
 #define T23_CHARGER_YORIGIN               0
@@ -685,7 +639,6 @@ struct mxt224E_platform_data {
 #define T23_CHARGER_AVERAGE               0
 #define T23_CHARGER_MVNULLRATE            0
 #define T23_CHARGER_MVDTHR                0
-
 
 #define T24_CHARGER_CTRL                  0
 #define T24_CHARGER_NUMGEST               0
@@ -702,7 +655,6 @@ struct mxt224E_platform_data {
 #define T24_CHARGER_TAPTHR                0
 #define T24_CHARGER_THROWTHR              0
 
-
 #define T25_CHARGER_CTRL                  0
 #define T25_CHARGER_CMD                   0
 #define T25_CHARGER_SIGLIM_0_UPSIGLIM     0
@@ -712,15 +664,11 @@ struct mxt224E_platform_data {
 #define T25_CHARGER_SIGLIM_2_UPSIGLIM     0
 #define T25_CHARGER_SIGLIM_2_LOSIGLIM     0
 
-
-
 #define T40_CHARGER_CTRL                  0
 #define T40_CHARGER_XLOGRIP               0
 #define T40_CHARGER_XHIGRIP               0
 #define T40_CHARGER_YLOGRIP               0
 #define T40_CHARGER_YHIGRIP               0
-
-
 
 #define T42_CHARGER_CTRL                  3
 #define T42_CHARGER_APPRTHR               20   
@@ -730,7 +678,6 @@ struct mxt224E_platform_data {
 #define T42_CHARGER_SUPEXTTO              0   
 #define T42_CHARGER_MAXNUMTCHS            8   
 #define T42_CHARGER_SHAPESTRENGTH         0   
-
 
 #define T46_CHARGER_CTRL                  0  
 #define T46_CHARGER_MODE                  3  
@@ -743,7 +690,6 @@ struct mxt224E_platform_data {
 #define T46_CHARGER_XSLEW                 1  
 #define T46_CHARGER_SYNCDELAY                 0
 
-
 #define T47_CHARGER_CTRL                  0
 #define T47_CHARGER_CONTMIN               0
 #define T47_CHARGER_CONTMAX               0
@@ -754,8 +700,6 @@ struct mxt224E_platform_data {
 #define T47_CHARGER_HOVERSUP              0
 #define T47_CHARGER_CONFTHR               0
 #define T47_CHARGER_SYNCSPERX             0
-
-
 
 #define T48_CHARGER_CTRL_TA                  23
 #define T48_CHARGER_CFG_TA                   0 
@@ -811,7 +755,6 @@ struct mxt224E_platform_data {
 #define T48_CHARGER_NEXTTCHDI_TA               0
 #define T48_CHARGER_CHGON_BIT          0x20
 
-
 #define T38_WIRELESS_USERDATA0             0
 #define T38_WIRELESS_USERDATA1             0     
 #define T38_WIRELESS_USERDATA2             0     
@@ -825,7 +768,6 @@ struct mxt224E_platform_data {
 #define T7_WIRELESS_ACTVACQINT             255
 #define T7_WIRELESS_ACTV2IDLETO            50
 
-
 #define T8_WIRELESS_CHRGTIME               24        
 #define T8_WIRELESS_CHRGTIME_TA     		  0         
 #define T8_WIRELESS_ATCHDRIFT              0
@@ -837,7 +779,6 @@ struct mxt224E_platform_data {
 #define T8_WIRELESS_ATCHCALSTHR             	1
 #define T8_WIRELESS_ATCHFRCCALTHR          	 127          
 #define T8_WIRELESS_ATCHFRCCALRATIO          127          
-
 
 #define T9_WIRELESS_CTRL                   139
 #define T9_WIRELESS_XORIGIN                0
@@ -875,7 +816,6 @@ struct mxt224E_platform_data {
 #define T9_WIRELESS_YPITCH                 0     
 #define T9_WIRELESS_NEXTTCHDI              1        
 
-
 #define T15_WIRELESS_CTRL                  0   
 #define T15_WIRELESS_XORIGIN               0
 #define T15_WIRELESS_XORIGIN_4KEY          0
@@ -890,10 +830,8 @@ struct mxt224E_platform_data {
 #define T15_WIRELESS_RESERVED_0            0
 #define T15_WIRELESS_RESERVED_1            0
 
-
 #define T18_WIRELESS_CTRL                  0
 #define T18_WIRELESS_COMMAND               0
-
 
 #define T19_WIRELESS_CTRL                  0
 #define T19_WIRELESS_REPORTMASK            0
@@ -912,7 +850,6 @@ struct mxt224E_platform_data {
 #define T19_WIRELESS_TRIGGER_2             0
 #define T19_WIRELESS_TRIGGER_3             0
 
-
 #define T23_WIRELESS_CTRL                  0
 #define T23_WIRELESS_XORIGIN               0
 #define T23_WIRELESS_YORIGIN               0
@@ -925,7 +862,6 @@ struct mxt224E_platform_data {
 #define T23_WIRELESS_AVERAGE               0
 #define T23_WIRELESS_MVNULLRATE            0
 #define T23_WIRELESS_MVDTHR                0
-
 
 #define T24_WIRELESS_CTRL                  0
 #define T24_WIRELESS_NUMGEST               0
@@ -942,7 +878,6 @@ struct mxt224E_platform_data {
 #define T24_WIRELESS_TAPTHR                0
 #define T24_WIRELESS_THROWTHR              0
 
-
 #define T25_WIRELESS_CTRL                  0
 #define T25_WIRELESS_CMD                   0
 #define T25_WIRELESS_SIGLIM_0_UPSIGLIM     0
@@ -952,15 +887,11 @@ struct mxt224E_platform_data {
 #define T25_WIRELESS_SIGLIM_2_UPSIGLIM     0
 #define T25_WIRELESS_SIGLIM_2_LOSIGLIM     0
 
-
-
 #define T40_WIRELESS_CTRL                  0
 #define T40_WIRELESS_XLOGRIP               0
 #define T40_WIRELESS_XHIGRIP               0
 #define T40_WIRELESS_YLOGRIP               0
 #define T40_WIRELESS_YHIGRIP               0
-
-
 
 #define T42_WIRELESS_CTRL                  3
 #define T42_WIRELESS_APPRTHR               20   
@@ -970,7 +901,6 @@ struct mxt224E_platform_data {
 #define T42_WIRELESS_SUPEXTTO              0   
 #define T42_WIRELESS_MAXNUMTCHS            8   
 #define T42_WIRELESS_SHAPESTRENGTH         0   
-
 
 #define T46_WIRELESS_CTRL                  0  
 #define T46_WIRELESS_MODE                  3  
@@ -983,7 +913,6 @@ struct mxt224E_platform_data {
 #define T46_WIRELESS_XSLEW                 2  
 #define T46_WIRELESS_SYNCDELAY                 0
 
-
 #define T47_WIRELESS_CTRL                  0
 #define T47_WIRELESS_CONTMIN               0
 #define T47_WIRELESS_CONTMAX               0
@@ -994,8 +923,6 @@ struct mxt224E_platform_data {
 #define T47_WIRELESS_HOVERSUP              0
 #define T47_WIRELESS_CONFTHR               0
 #define T47_WIRELESS_SYNCSPERX             0
-
-
 
 #define T48_WIRELESS_CTRL_TA                  23
 #define T48_WIRELESS_CFG_TA                   0 
@@ -1051,12 +978,6 @@ struct mxt224E_platform_data {
 #define T48_WIRELESS_NEXTTCHDI_TA               	0
 #define T48_WIRELESS_CHGON_BIT          			0x20
 
-
-
-
-
-
-
 #define MXT_GEN_MESSAGEPROCESSOR_T5                     5
 #define MXT_GEN_COMMANDPROCESSOR_T6                     6
 #define MXT_GEN_POWERCONFIG_T7                          7
@@ -1081,14 +1002,12 @@ struct mxt224E_platform_data {
 #define MXT_GEN_INFOBLOCK16BIT_T254                     254  
 #define	MXT_MAX_OBJECT_TYPES							50	
 
-
 #define MXT_ADR_T6_RESET                                0x00
 #define MXT_ADR_T6_BACKUPNV                             0x01
 #define MXT_ADR_T6_CALIBRATE                            0x02
 #define MXT_ADR_T6_REPORTALL                            0x03
 #define MXT_ADR_T6_RESERVED                             0x04
 #define MXT_ADR_T6_DIAGNOSTICS                          0x05
-
 
 #define MXT_ADR_T8_CHRGTIME                             0x00
 #define MXT_ADR_T8_RESERVED                             0x01
@@ -1138,8 +1057,6 @@ struct mxt224E_platform_data {
 #define MXT_ADR_T9_YEDGECTRL                            0x1c
 #define MXT_ADR_T9_YEDGEDIST                            0x1d
 
-
-
 #define MXT_ADR_T15_CTRL                                0x00
 #define MXT_T15_CFGB_ENABLE(x)                         (((x) >> 0) & 0x01)
 #define MXT_T15_CFGB_RPRTEN(x)                         (((x) >> 1) & 0x01)
@@ -1157,12 +1074,9 @@ struct mxt224E_platform_data {
 #define MXT_ADR_T15_RESERVED1                           0x09
 #define MXT_ADR_T15_RESERVED2                           0x0a
 
-
-
 #define MXT_ADR_T37_MODE                                0x00
 #define MXT_ADR_T37_PAGE                                0x01
 #define MXT_ADR_T37_DATA                                0x02
-
 
 #define MXT_ADR_T38_USER0                               0x00
 #define MXT_ADR_T38_USER1                               0x01
@@ -1173,7 +1087,6 @@ struct mxt224E_platform_data {
 #define MXT_ADR_T38_USER6                               0x06
 #define MXT_ADR_T38_USER7                               0x07
 
-
 #define MXT_ADR_T42_CTRL                                0x00
 #define MXT_ADR_T42_APPRTHR                             0x01   
 #define MXT_ADR_T42_MAXAPPRAREA                         0x02   
@@ -1182,9 +1095,6 @@ struct mxt224E_platform_data {
 #define MXT_ADR_T42_SUPEXTTO                            0x05   
 #define MXT_ADR_T42_MAXNUMTCHS                          0x06   
 #define MXT_ADR_T42_SHAPESTRENGTH                       0x07   
-
-
-
 
 #define MXT_ADR_T48_CTRL                                0x00
 #define MXT_T48_CFGB_ENABLE(x)                         (((x) >> 0) & 0x01)
@@ -1202,12 +1112,9 @@ struct mxt224E_platform_data {
 #define MXT_T48_CFGB_INCBIAS(x)                         (((x) >> 6) & 0x01)
 #define MXT_T48_CFGB_INCRST(x)                          (((x) >> 7) & 0x01)
 
-
-
 #define MXT_MSG_T5_REPORTID                             0x00
 #define MXT_MSG_T5_MESSAGE                              0x01
 #define MXT_MSG_T5_CHECKSUM                             0x08
-
 
 #define MXT_MSG_T6_STATUS_NORMAL                        0x00
 #define MXT_MSG_T6_STATUS                               0x01
@@ -1219,10 +1126,6 @@ struct mxt224E_platform_data {
 #define MXT_MSGB_T6_RESET                               0x80
 
 #define MXT_MSG_T6_CHECKSUM                             0x02
-
-
-
-
 
 #define MXT_MSG_T9_STATUS                               0x01
 
@@ -1241,15 +1144,12 @@ struct mxt224E_platform_data {
 #define MXT_MSG_T9_TCHAMPLITUDE                         0x06
 #define MXT_MSG_T9_TCHVECTOR                            0x07
 
-
 #define MXT_MSG_T15_STATUS                              0x01
 #define MXT_MSGB_T15_DETECT                             0x80
 
 #define MXT_MSG_T15_KEYSTATE                            0x02
 
-
 #define MXT_MSG_T19_STATUS                              0x01
-
 
 #define MXT_MSG_T20_STATUS                              0x01
 #define MXT_MSGB_T20_FACE_SUPPRESS                      0x01
@@ -1260,14 +1160,12 @@ struct mxt224E_platform_data {
 #define MXT_MSGB_T22_FHERR                              0x08
 #define MXT_MSG_T22_GCAFDEPTH                           0x02
 
-
 #define MXT_MSG_T23_STATUS                              0x01
 #define MXT_MSGB_T23_FALL                               0x20
 #define MXT_MSGB_T23_RISE                               0x40
 #define MXT_MSGB_T23_DETECT                             0x80
 
 #define MXT_MSG_T23_PROXDELTA                           0x02
-
 
 #define MXT_MSG_T24_STATUS                              0x01
 #define MXT_MSG_T24_XPOSMSB                             0x02
@@ -1277,7 +1175,6 @@ struct mxt224E_platform_data {
 
 #define MXT_MSG_T24_DIST                                0x06
 
-
 #define MXT_MSG_T25_STATUS                              0x01
 
 #define MXT_MSGR_T25_OK                                 0xFE
@@ -1286,7 +1183,6 @@ struct mxt224E_platform_data {
 #define MXT_MSGR_T25_SIGNAL_LIMIT_FAULT                 0x17
 #define MXT_MSGR_T25_GAIN_ERROR                         0x20
 #define MXT_MSG_T25_INFO                                0x02
-
 
 #define MXT_MSG_T27_STATUS                              0x01
 #define MXT_MSGB_T27_ROTATEDIR                          0x10
@@ -1298,23 +1194,16 @@ struct mxt224E_platform_data {
 #define MXT_MSG_T27_XYPOSLSB                            0x04
 #define MXT_MSG_T27_ANGLE                               0x05
 
-
 #define MXT_MSG_T27_SEPARATION                          0x06
-
 
 #define MXT_MSG_T28_STATUS                              0x01
 #define MXT_MSGB_T28_CHKERR                             0x01
 
-
-
 #define MXT_MSG_T42_STATUS                              0x01
 #define MXT_MSGB_T42_TCHSUP				 				0x01
 
-
-
 #define MXT_MSG_T46_STATUS                              0x01
 #define MXT_MSGB_T46_CHKERR                             0x01
-
 
 #define MT_GESTURE_RESERVED                             0x00
 #define MT_GESTURE_PRESS                                0x01
@@ -1329,12 +1218,10 @@ struct mxt224E_platform_data {
 #define MT_GESTURE_TAP_AND_PRESS                        0x0a
 #define MT_GESTURE_THROW                                0x0b
 
-
 #define MXT_APP_LOW 	0x4a
 #define MXT_APP_HIGH		0x4b
 #define MXT_BOOT_LOW		0x24
 #define MXT_BOOT_HIGH		0x25
-
 
 #define MXT_BOOT_VALUE		0xa5
 #define MXT_BACKUP_VALUE	0x55
@@ -1349,10 +1236,8 @@ struct mxt224E_platform_data {
 
 #define MXT_WAKE_TIME		25
 
-
 #define MXT_UNLOCK_CMD_MSB	0xaa
 #define MXT_UNLOCK_CMD_LSB	0xdc
-
 
 #define MXT_WAITING_BOOTLOAD_CMD	0xc0	
 #define MXT_WAITING_FRAME_DATA	0x80	
@@ -1361,7 +1246,6 @@ struct mxt224E_platform_data {
 #define MXT_FRAME_CRC_PASS	0x04
 #define MXT_APP_CRC_FAIL	0x40	
 #define MXT_BOOT_STATUS_MASK	0x3f
-
 
 #define	T48_CTRL				3
 #define	T48_CFG					4  
@@ -1424,8 +1308,5 @@ struct mxt224E_platform_data {
 
 #define MXT_END_OF_MESSAGES 	255
 
-
 #endif
-
-
 

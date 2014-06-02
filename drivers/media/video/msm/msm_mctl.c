@@ -638,12 +638,6 @@ static int msm_mctl_open(struct msm_cam_media_controller *p_mctl,
 				__func__, rc);
 			goto sensor_sdev_failed;
 		}
-
-        
-
-
-        
-
 		if (sync->actctrl.a_power_up)
 			rc = sync->actctrl.a_power_up(
 				sync->sdata->actuator_info);
@@ -719,12 +713,10 @@ static int msm_mctl_open(struct msm_cam_media_controller *p_mctl,
 	mutex_unlock(&sync->lock);
 	return rc;
 
-
 ispif_init_failed:
-	if (p_mctl->isp_sdev && p_mctl->isp_sdev->isp_release){
+	if (p_mctl->isp_sdev && p_mctl->isp_sdev->isp_release)
 		p_mctl->isp_sdev->isp_release(&p_mctl->sync,
 				p_mctl->gemini_sdev);
-	}
 isp_open_failed:
 	if (camdev->is_csic) {
 		v4l2_subdev_call(p_mctl->csic_sdev, core, ioctl,
@@ -746,39 +738,9 @@ csiphy_init_failed:
 			sync->sdata->actuator_info);
 	}
 act_power_up_failed:
-    
 
-
-    
 sensor_sdev_failed:
 	v4l2_subdev_call(p_mctl->sensor_sdev, core, s_power, 0);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 register_sdev_failed:
 	wake_unlock(&p_mctl->sync.wake_lock);
@@ -831,12 +793,6 @@ static int msm_mctl_release(struct msm_cam_media_controller *p_mctl)
 			p_mctl->sync.sdata->actuator_info);
 
 	v4l2_subdev_call(p_mctl->sensor_sdev, core, s_power, 0);
-
-
-    
-
-    
-
 	wake_unlock(&p_mctl->sync.wake_lock);
 	return rc;
 }

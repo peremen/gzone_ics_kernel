@@ -682,10 +682,7 @@ static int diagchar_write(struct file *file, const char __user *buf,
 {
 	int err, ret = 0, pkt_type;
 #ifdef DIAG_DEBUG
-
-
 	int i;
-
 #endif
 	struct diag_send_desc_type send = { NULL, NULL, DIAG_STATE_START, 0 };
 	struct diag_hdlc_dest_type enc = { NULL, NULL, 0 };
@@ -766,19 +763,6 @@ static int diagchar_write(struct file *file, const char __user *buf,
 	send.pkt = buf_copy;
 	send.last = (void *)(buf_copy + payload_size - 1);
 	send.terminate = 1;
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	mutex_lock(&driver->diagchar_mutex);
 	if (!buf_hdlc)

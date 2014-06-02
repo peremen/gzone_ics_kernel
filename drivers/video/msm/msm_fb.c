@@ -53,10 +53,7 @@
 #include "mdp.h"
 #include "mdp4.h"
 
-
 #include "mipi_lg4573b.h"
-
-
 
 #ifdef CONFIG_FB_MSM_TRIPLE_BUFFER
 #define MSM_FB_NUM	3
@@ -827,13 +824,8 @@ static int msm_fb_blank_sub(int blank_mode, struct fb_info *info,
 	case FB_BLANK_NORMAL:
 	case FB_BLANK_POWERDOWN:
 	default:
-	
-
-		if(blank_mode == FB_BLANK_POWERDOWN && mfd->ref_cnt ==0)
+		if (blank_mode == FB_BLANK_POWERDOWN && mfd->ref_cnt ==0)
 			break;
-
-	
-		
 		if (mfd->panel_power_on) {
 			int curr_pwr_state;
 
@@ -841,7 +833,7 @@ static int msm_fb_blank_sub(int blank_mode, struct fb_info *info,
 			curr_pwr_state = mfd->panel_power_on;
 			mfd->panel_power_on = FALSE;
 			bl_updated = 0;
-			bl_update_for_popup = 0;	
+			bl_update_for_popup = 0;
 
 			msleep(16);
 			ret = pdata->off(mfd->pdev);
@@ -1052,16 +1044,6 @@ static __u32 msm_fb_line_length(__u32 fb_index, __u32 xres, int bpp)
 		return xres * bpp;
 }
 
-
-
-
-
-
-
-
-
-
-
 static int msm_fb_register(struct msm_fb_data_type *mfd)
 {
 	int ret = -ENODEV;
@@ -1076,13 +1058,6 @@ static int msm_fb_register(struct msm_fb_data_type *mfd)
 	static int subsys_id[2] = {MSM_SUBSYSTEM_DISPLAY,
 		MSM_SUBSYSTEM_ROTATOR};
 	unsigned int flags = MSM_SUBSYSTEM_MAP_IOVA;
-	
-
-
-
-
-
-
 	/*
 	 * fb info initialization
 	 */
@@ -3247,17 +3222,6 @@ static int msm_fb_ioctl(struct fb_info *info, unsigned int cmd,
 	struct mdp_page_protection fb_page_protection;
 	struct msmfb_mdp_pp mdp_pp;
 	int ret = 0;
-	
- 
-
-
-  
-
-
-
- 
-
-
 
 	struct msmfb_request_parame user_req;
 
@@ -3555,185 +3519,30 @@ static int msm_fb_ioctl(struct fb_info *info, unsigned int cmd,
 		ret = msmfb_handle_pp_ioctl(&mdp_pp);
 		break;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    case MSMFB_CUSTOM_9:
-        ret = copy_from_user(&user_req, argp, sizeof(user_req));
-        if (ret)
-        {
-            printk(KERN_ERR "%s. Error - %d\n",__func__, __LINE__);
-            break;
-        }
-        
-
-        ret = copy_from_user(&mdp4_overlay_argb_enable, user_req.data, sizeof(mdp4_overlay_argb_enable));
-        if (ret)
-        {
-            printk(KERN_ERR "%s. Error - %d\n",__func__, __LINE__);
-            break;
-        }
-        
-        ret = copy_to_user(argp, &user_req, sizeof(user_req));
-        break;
-
-    case MSMFB_CUSTOM_156 :
-        mdp_mddi_dma_s_stop(1);
-        break;
-        
-    case MSMFB_CUSTOM_157 :
-        mdp_mddi_dma_s_stop(0);
-        break;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	case MSMFB_CUSTOM_9:
+		ret = copy_from_user(&user_req, argp, sizeof(user_req));
+		if (ret) {
+			printk(KERN_ERR "%s. Error - %d\n",__func__, __LINE__);
+			break;
+		}
+
+		ret = copy_from_user(&mdp4_overlay_argb_enable, user_req.data,
+				sizeof(mdp4_overlay_argb_enable));
+		if (ret) {
+			printk(KERN_ERR "%s. Error - %d\n",__func__, __LINE__);
+			break;
+		}
+
+		ret = copy_to_user(argp, &user_req, sizeof(user_req));
+		break;
+
+	case MSMFB_CUSTOM_156 :
+		mdp_mddi_dma_s_stop(1);
+		break;
+
+	case MSMFB_CUSTOM_157 :
+		mdp_mddi_dma_s_stop(0);
+		break;
 	default:
 		MSM_FB_INFO("MDP: unknown ioctl (cmd=%x) received!\n", cmd);
 		ret = -EINVAL;

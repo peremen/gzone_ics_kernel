@@ -356,13 +356,7 @@ void mmc_set_data_timeout(struct mmc_data *data, const struct mmc_card *card)
 			 */
 			limit_us = 800000;
 		else
-
-
-
 			limit_us = 250000;
-
-
-
 
 		/*
 		 * SDHC cards always use these fixed values.
@@ -1147,11 +1141,9 @@ void mmc_power_off(struct mmc_host *host)
 
 	mmc_host_clk_release(host);
 
-
 	if (host->card && mmc_card_sd(host->card)) {
 		mdelay(5);
 	}
-
 
 }
 

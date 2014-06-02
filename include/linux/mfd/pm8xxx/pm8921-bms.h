@@ -215,10 +215,6 @@ int pm8921_bms_get_simultaneous_battery_voltage_and_current(int *ibat_ua,
 int pm8921_bms_get_rbatt(void);
 
 
-
-
-
-
 void pm8921_bms_invalidate_shutdown_soc(void);
 #else
 static inline int pm8921_bms_get_vsense_avg(int *result)
