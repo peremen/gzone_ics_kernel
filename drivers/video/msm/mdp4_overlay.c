@@ -2464,10 +2464,8 @@ static u32 mdp4_overlay_blt_enable(struct mdp_overlay *req,
 			use_blt = 1;
 	}
 
-	if( (mfd->panel_info.type == MIPI_VIDEO_PANEL) && use_blt == 1)
-	{
-		printk("#### blt case --> no blt solution applied\n");
-	     use_blt = 0;
+	if ((mfd->panel_info.type == MIPI_VIDEO_PANEL) && use_blt == 1) {
+		use_blt = 0;
 	}
 
 	return use_blt;

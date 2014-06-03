@@ -230,13 +230,8 @@ int __init get_silent_mode(void)
 
 static int __init boot_silent_mode(char *boot_mode)
 {
-	if (!strncmp("on", boot_mode, 2)) {
-		printk("Silent boot mode : on\n");
+	if (!strncmp("on", boot_mode, 2))
 		vib_onoff = 1;
-	}
-	else
-		printk("Silent boot mode : off\n");
-
 	return 1;
 }
 __setup("androidboot.silent=", boot_silent_mode);

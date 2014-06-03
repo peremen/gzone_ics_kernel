@@ -2153,14 +2153,12 @@ static void tabla_get_mbhc_micbias_regs(struct snd_soc_codec *codec,
 
 	switch (tabla->mbhc_cfg.micbias) {
 	case TABLA_MICBIAS1:
-	    printk("skr:TABLA_MICBIAS1\n");
 		cfilt = tabla->pdata->micbias.bias1_cfilt_sel;
 		micbias_regs->mbhc_reg = TABLA_A_MICB_1_MBHC;
 		micbias_regs->int_rbias = TABLA_A_MICB_1_INT_RBIAS;
 		micbias_regs->ctl_reg = TABLA_A_MICB_1_CTL;
 		break;
 	case TABLA_MICBIAS2:
-	    printk("skr:TABLA_MICBIAS2\n");
 		cfilt = tabla->pdata->micbias.bias2_cfilt_sel;
 		micbias_regs->mbhc_reg = TABLA_A_MICB_2_MBHC;
 		micbias_regs->int_rbias = TABLA_A_MICB_2_INT_RBIAS;

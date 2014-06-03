@@ -124,7 +124,6 @@ void lm3530_backlight_on(int level)
 		lm3530_write_reg(main_lm3530_dev->client, 0x10, 0xB5);
 		lm3530_write_reg(main_lm3530_dev->client, 0x30, 0x09); 
 	}
-	printk("%s received (prev backlight_status: %s)\n",  __func__, backlight_status?"ON":"OFF");
 	backlight_status = LM3530_BL_ON;
 	return;
 }
@@ -142,7 +141,6 @@ EXPORT_SYMBOL(lm3530_lcd_backlight_set_level2);
 void lm3530_backlight_off(struct early_suspend * h)
 {
 	int gpio = main_lm3530_dev->gpio;
-	printk("%s, backlight_status : %d\n",__func__,backlight_status);
 
 	if (backlight_status == LM3530_BL_OFF)
 		return;
@@ -167,7 +165,6 @@ void lm3530_backlight_off(struct early_suspend * h)
 void lm3530_lcd_backlight_enable(int level)
 {
 	int ret=0;
-	printk("%s, backlight_status : %d\n",__func__,backlight_status);
 	if (backlight_status == LM3530_BL_OFF) {
 		ret = lm3530_write_reg(main_lm3530_dev->client, 0x10, 0xB5);
 		ret |= lm3530_write_reg(main_lm3530_dev->client, 0x30, 0x09);
@@ -180,7 +177,6 @@ void lm3530_lcd_backlight_enable(int level)
 void lm3530_lcd_backlight_disable(int level)
 {
 	int ret;
-	printk("%s, backlight_status : %d\n",__func__,backlight_status);
 	if (backlight_status == LM3530_BL_OFF)
 		return;
 	backlight_status = LM3530_BL_OFF;
@@ -217,8 +213,6 @@ EXPORT_SYMBOL(lm3530_lcd_backlight_set_level);
 
 static int bl_set_intensity(struct backlight_device *bd)
 {
-	printk("%s, backlight_status : brightness[%d] status[%d]\n", __func__, 
-			bd->props.brightness, backlight_status);
 	backlight_status = LM3530_BL_OFF;
 	return 0;
 }
@@ -240,8 +234,6 @@ static int __devinit lm3530_probe(struct i2c_client *i2c_dev,
 	struct lm3530_device *dev;
 	struct backlight_device *bl_dev;
 	struct backlight_properties props;
-
-	printk("%s: i2c probe start\n", __func__);
 
 	pdata = i2c_dev->dev.platform_data;
 	lm3530_i2c_client = i2c_dev;
@@ -292,7 +284,6 @@ static int __devexit lm3530_remove(struct i2c_client *i2c_dev)
 	gpio_tlmm_config(GPIO_CFG(gpio, 0, GPIO_CFG_OUTPUT, GPIO_CFG_NO_PULL,
 				GPIO_CFG_2MA), GPIO_CFG_ENABLE);
 	gpio_direction_output(gpio, 0);
-	printk("%s, backlight_status : %d\n",__func__,gpio_get_value(gpio));
 
 	if (gpio_is_valid(gpio))
 		gpio_free(gpio);

@@ -439,7 +439,6 @@ static int mipi_dsi_cdp_panel_power(int on)
 			pr_err("enable l2 failed, rc=%d\n", rc);
 			return -ENODEV;
 		}
-		
                 rc = regulator_enable(reg_l29);
                 if (rc) {
                     pr_err("enable I29 failed, rc=%d\n", rc);
@@ -455,15 +454,13 @@ static int mipi_dsi_cdp_panel_power(int on)
                 gpio_set_value_cansleep(gpio24, 1);
                 mdelay(10);
                 ts_lcd_flag = 1;
-                printk("%s: gpio_set_value_cansleep ts_lcd_flag[%d]\n", __func__, ts_lcd_flag);
 	} else {
 		extern int lcd_status;
 		if (lcd_status) {
-			printk("%s: gpio_set_value_cansleep lcd_status[%d]\n", __func__, lcd_status);
 			mdelay(100);
 		}
 
-		ts_lcd_flag = 0;		
+		ts_lcd_flag = 0;
 		rc = regulator_disable(reg_l2);
 		if (rc) {
 			pr_err("disable reg_l2 failed, rc=%d\n", rc);
@@ -495,7 +492,7 @@ static int mipi_dsi_cdp_panel_power(int on)
 			return -EINVAL;
 		}
 		gpio_set_value_cansleep(gpio43, 0);
-		gpio_set_value_cansleep(gpio24, 0);   
+		gpio_set_value_cansleep(gpio24, 0);
 
 		rc = regulator_disable(reg_l29);
 		if (rc) {
@@ -504,7 +501,6 @@ static int mipi_dsi_cdp_panel_power(int on)
 		}
 
 		mdelay(120);
-		printk("%s: gpio_set_value_cansleep\n", __func__);
 
 	}
 	return 0;
@@ -512,7 +508,6 @@ static int mipi_dsi_cdp_panel_power(int on)
 
 void mipi_dsi_cdp_panel_power_interface(int on)
 {
-	printk("%s: mipi_dsi_cdp_panel_power_interface \n", __func__);
 	mipi_dsi_cdp_panel_power(on);
 }
 

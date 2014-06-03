@@ -724,9 +724,6 @@ int32_t msm_sensor_imx111_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 	struct msm_camera_sensor_info *data = s_ctrl->sensordata;
 	CDBG("%s\n", __func__);
 
-	printk("imx111.c %s: start\n", __func__);
-
-
 	msleep(IMX111_WAIT_PWOFF_MCLK);
 
 	gpio_direction_output(IMX111_GPIO_CAM_MCLK0, 0);
@@ -787,20 +784,15 @@ int32_t msm_sensor_imx111_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 		cam_vdig = NULL;
 	}
 
-	printk("imx111.c %s: end\n", __func__);
 	return 0;
 }
 
 int32_t msm_sensor_imx111_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	int32_t rc = 0;
-
-
 	struct msm_camera_sensor_info *data = s_ctrl->sensordata;
 
 	CDBG("%s: %d\n", __func__, __LINE__);
-	printk("imx111.c %s: start\n", __func__);
-
 	s_ctrl->reg_ptr = kzalloc(sizeof(struct regulator *)
 			* data->sensor_platform_info->num_vreg, GFP_KERNEL);
 	if (!s_ctrl->reg_ptr) {
@@ -962,7 +954,6 @@ int32_t msm_sensor_imx111_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 	gpio_direction_output(IMX111_GPIO_CAM_MCLK0, 1);
 
 	mdelay(IMX111_WAIT_PWON_CLK_2);
-	printk("imx111.c %s: end\n", __func__);
 	return rc;
 }
 
@@ -1040,13 +1031,9 @@ int32_t imx111_sensor_setting(struct msm_sensor_ctrl_t *s_ctrl,
 		int update_type, int res)
 {
 	int32_t rc = 0;
-
 	int linecount;
 	int frame_time,exposure_time;
 	struct msm_sensor_output_info_t curr_info,new_info;
-
-
-	printk("imx111.c %s: start %d\n", __func__,res);
 
 	curr_info = imx111_dimensions[s_ctrl->curr_res];
 	new_info  = imx111_dimensions[res];
@@ -1066,8 +1053,7 @@ int32_t imx111_sensor_setting(struct msm_sensor_ctrl_t *s_ctrl,
 			CDBG("%s: msm_sensor_enable_debugfs (rc:%d)\n", __func__,rc);
 		}
 		rc = msm_sensor_write_init_settings(s_ctrl);
-		if(rc < 0){
-			printk("%s: msm_sensor_write_init_settings (rc:%d)\n", __func__,rc);
+		if (rc < 0) {
 			return rc;
 		}
 
@@ -1181,7 +1167,6 @@ int32_t imx111_sensor_setting(struct msm_sensor_ctrl_t *s_ctrl,
 			msleep(exposure_time);
 		}
 	}
-	printk("imx111.c %s: end\n", __func__);
 	return rc;
 }
 

@@ -1910,7 +1910,6 @@ int msm_usb_adc_read(void)
 
 	if (result.physical <=	USB_AUDIO_VOLTAGE_MAX && result.physical >= USB_AUDIO_VOLTAGE_MIN) {
 		switch_set_state(&sdev, USB_AUDIO_OUT);
-		printk("\n\n[DEBUG] %s\n\n", __func__);
 		return 1;
 	}
 	switch_set_state(&sdev, NO_DEVICE);
@@ -1925,38 +1924,26 @@ static void msm_usb_adc_test_work(struct work_struct *w)
 
 	struct pm8xxx_adc_chan_result result;
 	int rc = -1;
-	printk("[DEBUG] %s start\n", __func__);
 
 	rc = pm8xxx_adc_mpp_config_read(PM8XXX_AMUX_MPP_3,
 							ADC_MPP_1_AMUX6, &result);
-
-	if (rc) {
-		printk("\n\n[DEBUG] [MSM_OTG] AMUX_MPP_3 %s : rc(%d) \n", __func__, rc);
-	} else {
-
-	}
 
 	if ((test_bit(B_SESS_VLD, &motg->inputs))){
 		if (result.physical <=	USB_AUDIO_VOLTAGE_MAX && result.physical >= USB_AUDIO_VOLTAGE_MIN) {
 			gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 1);
 			switch_set_state(&sdev, USB_AUDIO_OUT);
-			printk("\n\n[DEBUG] USB_SEL(%d) HIGH set USB audio \n",1);
-		}
-		else{
+		} else{
 			gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 0);
 			switch_set_state(&sdev, NO_DEVICE);
-			printk("\n\n[DEBUG] USB_SEL(%d) HIGH set USB mode \n",1);
 		}
 	} else {
 		if (result.physical <=	USB_AUDIO_VOLTAGE_MAX && result.physical >= USB_AUDIO_VOLTAGE_MIN) {
 			gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 0);
 			switch_set_state(&sdev, USB_AUDIO_OUT);
-			printk("\n\n[DEBUG] USB_SEL(%d) Low Power Mode set USB Audio \n",0);
 		}
 		else{
 			gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 1);
 			switch_set_state(&sdev, NO_DEVICE);
-			printk("\n\n[DEBUG] USB_SEL(%d) Low Power Mode set USB mode \n",0);
 		}
 	}
 	schedule_delayed_work(&motg->adc_test_work, ADC_TEST_FREQ);
@@ -2038,7 +2025,6 @@ static void msm_otg_sm_work(struct work_struct *w)
 			otg->state = OTG_STATE_A_HOST;
 		} else if (test_bit(B_SESS_VLD, &motg->inputs)) {
 #if USE_INTR_FROM_VBUS
-
 			if (msm_usb_adc_read()) {
 				cancel_delayed_work_sync(&motg->adc_test_work);
 				motg->chg_state = USB_CHG_STATE_DETECTED;
@@ -2048,17 +2034,12 @@ static void msm_otg_sm_work(struct work_struct *w)
 						IDEV_CHG_MAX);
 				pm_runtime_put_noidle(otg->dev);
 				pm_runtime_suspend(otg->dev);
-
 				gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 1);
-				printk("\n\n\n[DEBUG] A_LP_SEL_PM %d \n\n\n", gpio_get_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM)));
-
 				return;
-
 			} else {
 				schedule_delayed_work(&motg->adc_test_work, ADC_TEST_FREQ);
 				gpio_set_value_cansleep(PM8921_GPIO_PM_TO_SYS(A_LP_SEL_PM), 0);
 			}
-
 #endif
 			switch (motg->chg_state) {
 			case USB_CHG_STATE_UNDEFINED:
@@ -3031,7 +3012,6 @@ static int __devexit msm_otg_remove(struct platform_device *pdev)
 	cancel_delayed_work_sync(&motg->pmic_id_status_work);
 
 	switch_dev_unregister(&sdev);
-	printk("[DEBUG] %s \n",__func__);
 	cancel_delayed_work_sync(&motg->adc_test_work);
 
 	cancel_work_sync(&motg->sm_work);

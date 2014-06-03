@@ -49,13 +49,13 @@
 
 #if defined(ST21_FS_DEUBG)
 #define st21_debug(fmt, ...) \
-	printk("ST21Debug ////////// " pr_fmt(fmt), ##__VA_ARGS__)
+	printk(KERN_INFO "ST21Debug ////////// " pr_fmt(fmt), ##__VA_ARGS__)
 #endif
 
 #define ST21_IRQ_ACTIVE_HIGH 1
 #define ST21_IRQ_ACTIVE_LOW 0
 
-static int st21_debug_log = 0; 
+static int st21_debug_log = 0;
 
 struct st21nfca_dev	{
 	wait_queue_head_t	read_wq;
@@ -65,7 +65,7 @@ struct st21nfca_dev	{
 	unsigned int		irq_gpio;
 	unsigned int    ena_gpio;
 	unsigned int    polarity_mode;
-	unsigned int    active_polarity; 
+	unsigned int    active_polarity;
 	bool			irq_enabled;
 	spinlock_t		irq_enabled_lock;
 };
@@ -251,15 +251,12 @@ nfc_show_log_write(struct device *dev,
 	int value;
 
 	value = simple_strtoul(buf, NULL, 10);
-	printk(">>>>>>>> nfc_show_all_store value=%d buf=%s", value, buf);
 	if (value != 0 && value != 1) {
-		printk(">>>>>>>> nfc_show_all_store buff is not 0 or 1 ! is %d\n", value);
 		return count;
 	}
 	if (value) {
 		st21_debug_log = 1;
-	}
-	else {
+	} else {
 		st21_debug_log = 0;
 	}
 
@@ -277,14 +274,12 @@ static int st21_sysfs_init(void)
 
 	android_nfc_kobj = kobject_create_and_add("android_nfc", NULL) ;
 	if (android_nfc_kobj == NULL) {
-		printk(">>>>>>>> st21_sysfs_init: subsystem_register failed\n");
 		ret = -ENOMEM;
 		goto err;
 	}
 
 	ret = sysfs_create_file(android_nfc_kobj, &dev_attr_show_log.attr);
 	if (ret) {
-		printk(">>>>>>>> st21_sysfs_init: sysfs_create_group vendor failed\n");
 		goto err4;
 	}
 
@@ -485,7 +480,7 @@ static int st21nfca_resume(struct i2c_client *client)
 		st21_debug("%s : failing no st21 context %p !!!\n", __func__, st21nfca_dev);
 	}
 	st21_debug("%s : failing no context %p!!!\n", __func__,client);
-	return 0; 
+	return 0;
 }
 
 static struct i2c_driver st21nfca_driver = {

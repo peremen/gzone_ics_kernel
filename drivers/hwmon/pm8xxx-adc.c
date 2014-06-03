@@ -1208,8 +1208,6 @@ static ssize_t pm8xxx_xo_therm_show(struct device *dev,
     int rc = -1;
     rc = pm8xxx_adc_mpp_config_read(PM8XXX_AMUX_MPP_3,
                                     CHANNEL_MUXOFF, &result);
-
-    printk("jason.ku physical = %lld\n", result.physical);
     if (rc)
 	    return 0;
     return snprintf(buf, PM8XXX_ADC_HWMON_NAME_LENGTH,

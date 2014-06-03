@@ -1153,7 +1153,8 @@ int mipi_dsi_cmds_tx(struct msm_fb_data_type *mfd,
 	cm = cmds;
 	mipi_dsi_buf_init(tp);
 
-	if(0) {
+	gpio24 = PM8921_GPIO_PM_TO_SYS(24);
+	if (gpio_get_value_cansleep(gpio24)) {
 		for (i = 0; i < cnt; i++) {
 			mipi_dsi_buf_init(tp);
 			mipi_dsi_cmd_dma_add(tp, cm);
@@ -1161,18 +1162,6 @@ int mipi_dsi_cmds_tx(struct msm_fb_data_type *mfd,
 			if (cm->wait)
 			msleep(cm->wait);
 			cm++;
-		}
-	} else {
-		gpio24 = PM8921_GPIO_PM_TO_SYS(24);
-		if (gpio_get_value_cansleep(gpio24)) {
-			for (i = 0; i < cnt; i++) {
-				mipi_dsi_buf_init(tp);
-				mipi_dsi_cmd_dma_add(tp, cm);
-				mipi_dsi_cmd_dma_tx(tp);
-				if (cm->wait)
-				msleep(cm->wait);
-				cm++;
-			}
 		}
 	}
 
