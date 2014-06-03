@@ -35,9 +35,7 @@
 
 #define MT9M113_LOG_INF(fmt, args...) printk(KERN_INFO "mt9m113:%s(%d) " fmt, __func__, __LINE__, ##args)
 
-
-#define MT9M113_DBG_REG_CHECK   MT9M113_LOG_DBG_ON   
-
+#define MT9M113_DBG_REG_CHECK   MT9M113_LOG_DBG_ON
 
 struct pm_gpio mt9m113_cam2_v_en1_on = {
 	.direction      = PM_GPIO_DIR_OUT,
@@ -1267,7 +1265,7 @@ static struct msm_cam_clk_info mt9m113_cam_clk_info[] = {
 static int mt9m113_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 {
 	struct msm_camera_sensor_info *data = s_ctrl->sensordata;
-	MT9M113_LOG_INF("START");
+	MT9M113_LOG_DBG("START");
 
 	gpio_set_value_cansleep(MT9M113_GPIO_CAM2_RST_N, GPIOF_OUT_INIT_LOW);
 	usleep_range(MT9M113_GPIOF_OUT_INIT_LOW_DELAY, MT9M113_GPIOF_OUT_INIT_LOW_DELAY + 1000);
@@ -1320,7 +1318,7 @@ static int mt9m113_sensor_power_down(struct msm_sensor_ctrl_t *s_ctrl)
 	}
 
 	kfree(s_ctrl->reg_ptr);
-	MT9M113_LOG_INF("END(0)");
+	MT9M113_LOG_DBG("END(0)");
 
 	return 0;
 }
@@ -1330,7 +1328,7 @@ static int32_t mt9m113_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 	int32_t rc = 0;
 	struct msm_camera_sensor_info *data = s_ctrl->sensordata;
 
-	MT9M113_LOG_INF("START");
+	MT9M113_LOG_DBG("START");
 	s_ctrl->reg_ptr = kzalloc(sizeof(struct regulator *)
 			* data->sensor_platform_info->num_vreg, GFP_KERNEL);
 	if (!s_ctrl->reg_ptr) {
@@ -1467,7 +1465,7 @@ static int32_t mt9m113_sensor_power_up(struct msm_sensor_ctrl_t *s_ctrl)
 	MT9M113_LOG_DBG("GPIO[%d]:%d\n", MT9M113_GPIO_CAM2_RST_N, gpio_get_value(MT9M113_GPIO_CAM2_RST_N));
 	MT9M113_LOG_DBG("GPIO[%d]:%d\n", MT9M113_GPIO_CAM1_RST_N, gpio_get_value(MT9M113_GPIO_CAM1_RST_N));
 
-	MT9M113_LOG_INF("END(%d)",rc);
+	MT9M113_LOG_DBG("END(%d)",rc);
 	return rc;
 
 cam_vdig_enable_failed:
@@ -1523,7 +1521,7 @@ cam_vio_enable_failed:
 cam_vio_get_failed:
 	kfree(s_ctrl->reg_ptr);
 
-	MT9M113_LOG_INF("END(%d)",rc);
+	MT9M113_LOG_DBG("END(%d)",rc);
 	return rc;
 }
 

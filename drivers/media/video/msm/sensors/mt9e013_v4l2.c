@@ -288,8 +288,6 @@ void msm_camera_set_bitfield(struct msm_camera_i2c_client *client,
 
 static void mt9e013_prev_settings(struct msm_sensor_ctrl_t *s_ctrl)
 {
-	pr_info("mt9e013_prev_settings\n");
-	
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0300, 0x4,    MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0302, 0x1,    MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0304, 0x2,    MSM_CAMERA_I2C_WORD_DATA);
@@ -324,7 +322,6 @@ static void mt9e013_prev_settings(struct msm_sensor_ctrl_t *s_ctrl)
 
 static void mt9e013_snap_settings(struct msm_sensor_ctrl_t *s_ctrl)
 {
-	pr_info("mt9e013_snap_settings\n");
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0300, 0x4 ,   MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0302, 0x1 ,   MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0304, 0x2 ,   MSM_CAMERA_I2C_WORD_DATA);
@@ -358,7 +355,6 @@ static void mt9e013_snap_settings(struct msm_sensor_ctrl_t *s_ctrl)
 
 static void mt9e013_video_HD_settings(struct msm_sensor_ctrl_t *s_ctrl)
 {
-	pr_info("mt9e013_video_HD_settings\n");
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0300, 0x4 ,   MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0302, 0x1 ,   MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0304, 0x2 ,   MSM_CAMERA_I2C_WORD_DATA);
@@ -392,7 +388,6 @@ static void mt9e013_video_HD_settings(struct msm_sensor_ctrl_t *s_ctrl)
 
 static void mt9e013_HS_settings(struct msm_sensor_ctrl_t *s_ctrl)
 {
-	pr_info("mt9e013_HS_settings\n");
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0300, 0x4 ,   MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0302, 0x1 ,   MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0304, 0x2 ,   MSM_CAMERA_I2C_WORD_DATA);
@@ -426,7 +421,6 @@ static void mt9e013_HS_settings(struct msm_sensor_ctrl_t *s_ctrl)
 
 static void mt9e013_video_FHD_settings(struct msm_sensor_ctrl_t *s_ctrl)
 {
-	pr_info("mt9e013_video_FHD_settings\n");
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0300, 0x4 ,   MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0302, 0x1 ,   MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0304, 0x2 ,   MSM_CAMERA_I2C_WORD_DATA);
@@ -461,7 +455,6 @@ static void mt9e013_video_FHD_settings(struct msm_sensor_ctrl_t *s_ctrl)
 
 static void mt9e013_video_60fps_settings(struct msm_sensor_ctrl_t *s_ctrl)
 {
-	pr_info("mt9e013_video_60fps_settings\n");
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0300, 0x4,    MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0302, 0x1,    MSM_CAMERA_I2C_WORD_DATA);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x0304, 0x2,    MSM_CAMERA_I2C_WORD_DATA);
@@ -497,7 +490,6 @@ static void mt9e013_video_60fps_settings(struct msm_sensor_ctrl_t *s_ctrl)
 
 static void mt9e013_recommend_settings(struct msm_sensor_ctrl_t *s_ctrl)
 {
-	pr_info("mt9e013_recommend_settings\n");
 	msm_camera_set_bitfield(s_ctrl->sensor_i2c_client, 0x3064, 0x0100, 0);
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x31AE, 0x0202, MSM_CAMERA_I2C_WORD_DATA); 
 	msm_camera_i2c_write(s_ctrl->sensor_i2c_client, 0x31B0, 0x0083, MSM_CAMERA_I2C_WORD_DATA); 
@@ -638,10 +630,9 @@ static int32_t mt9e013_sensor_write_res_settings(struct msm_sensor_ctrl_t *s_ctr
 {
 	int32_t rc;
 
-	pr_info("mt9e013_sensor_write_res_settings res = %d\n",res);
 	mt9e013_recommend_settings(s_ctrl);
 
-	switch(res){
+	switch (res) {
 	case MSM_SENSOR_RES_QTR:
 		mt9e013_prev_settings(s_ctrl);
 		break;
