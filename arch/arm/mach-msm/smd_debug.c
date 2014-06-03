@@ -478,22 +478,18 @@ static int debug_read_mem(char *buf, int max)
 
 	for (n = 0; n < SMEM_NUM_ITEMS; n++) {
 		if (toc[n].allocated == 0)
-			continue; 
+			continue;
 
-
-		if(n == SMEM_ERR_CRASH_LOG )
+		if (n == SMEM_ERR_CRASH_LOG )
 			i += scnprintf(buf + i, max - i,
 			       "SMEM_ERR_CRASH_LOG : %04d: offset %08x size %08x\n",
 			       n, toc[n].offset, toc[n].size);
 
-		else if(n == SMEM_ERR_F3_TRACE_LOG )
+		else if (n == SMEM_ERR_F3_TRACE_LOG )
 			i += scnprintf(buf + i, max - i,
 			       "SMEM_ERR_F3_TRACE_LOG : %04d: offset %08x size %08x\n",
 			       n, toc[n].offset, toc[n].size);
 		else
-
-
-
 			i += scnprintf(buf + i, max - i,
 			       "%04d: offset %08x size %08x\n",
 			       n, toc[n].offset, toc[n].size);
